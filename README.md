@@ -1,2 +1,2 @@
-# Data Base Access Control App
-Implementation of Data Base Access Control Mechanisms - university project
+# Database Access Control App
+Implementation of Database Access Control mechanisms
