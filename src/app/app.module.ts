@@ -4,18 +4,25 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { MatButtonModule, MatCheckboxModule } from "@angular/material";
+import { MatButtonModule, MatCardModule, MatCheckboxModule, MatIconModule, MatInputModule } from "@angular/material";
+import { LoginScreenComponent } from './login-screen/login-screen.component';
+import { FormsModule } from "@angular/forms";
 
 @NgModule({
 	declarations: [
-		AppComponent
+		AppComponent,
+		LoginScreenComponent
 	],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
 		BrowserAnimationsModule,
 		MatButtonModule,
-		MatCheckboxModule
+		MatCheckboxModule,
+		MatCardModule,
+		MatInputModule,
+		MatIconModule,
+		FormsModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]
