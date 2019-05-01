@@ -1,19 +1,30 @@
 <div id="bg">
 	<mat-card>
 		<mat-card-title>Sign in</mat-card-title>
-		<div>
+		<form [formGroup]="formControl">
 			<mat-form-field>
 				<mat-label>Email</mat-label>
-				<input matNativeControl>
+				<input matNativeControl formControlName="email" [errorStateMatcher]="matcher">
+				<mat-error *ngIf="formControl.get('email').hasError('pattern') && !formControl.get('email').hasError('required')">
+					Please enter a valid email address
+				</mat-error>
+				<mat-error *ngIf="formControl.get('email').hasError('required')">
+					Email is <strong>required</strong>
+				</mat-error>
 			</mat-form-field>
 			<mat-form-field>
 				<mat-label>Password</mat-label>
-				<input [type]="hide ? 'password' : 'text'" matNativeControl [(ngModel)]="password">
-				<mat-icon matSuffix (click)="hide = !hide">{{password ? hide ? 'visibility' : 'visibility_off' : ''}}</mat-icon>
+				<input matNativeControl formControlName="password" [type]="passwordHidden ? 'password' : 'text'">
+				<mat-icon matSuffix (click)="passwordHidden = !passwordHidden">{{password ? passwordHidden ? 'visibility' : 'visibility_off' : ''}}</mat-icon>
+				<mat-error *ngIf="formControl.get('password').hasError('required')">
+					Password is <strong>required</strong>
+				</mat-error>
 			</mat-form-field>
-		</div>
+		</form>
 		<mat-card-actions>
-			<button mat-raised-button color="primary">LOGIN</button>
+			<button mat-raised-button color="primary" [disabled]="!formControl.valid"
+					(click)="loginService.login(formControl.get('email').value, formControl.get('password').value)">LOGIN
+			</button>
 		</mat-card-actions>
 	</mat-card>
 </div>
