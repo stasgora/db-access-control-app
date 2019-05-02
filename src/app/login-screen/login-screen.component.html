@@ -14,8 +14,11 @@
 			</mat-form-field>
 			<mat-form-field>
 				<mat-label>Password</mat-label>
-				<input matNativeControl formControlName="password" [type]="passwordHidden ? 'password' : 'text'">
-				<mat-icon matSuffix (click)="passwordHidden = !passwordHidden">{{password ? passwordHidden ? 'visibility' : 'visibility_off' : ''}}</mat-icon>
+				<input matNativeControl formControlName="password" [errorStateMatcher]="matcher" [type]="passwordHidden ? 'password' : 'text'">
+				<mat-icon matSuffix (click)="passwordHidden = !passwordHidden">{{formControl.get('password').value ? passwordHidden ? 'visibility' : 'visibility_off' : ''}}</mat-icon>
+				<mat-error *ngIf="formControl.get('password').hasError('pattern') && !formControl.get('password').hasError('required')">
+					Password must contain at least 1 of the following: upper case letter, lower case letter, numeric character, special character and be at least 8 characters long
+				</mat-error>
 				<mat-error *ngIf="formControl.get('password').hasError('required')">
 					Password is <strong>required</strong>
 				</mat-error>
