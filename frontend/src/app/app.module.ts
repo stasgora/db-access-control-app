@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatButtonModule, MatCardModule, MatCheckboxModule, MatIconModule, MatInputModule } from "@angular/material";
 import { LoginScreenComponent } from './login-screen/login-screen.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { HttpClientModule } from "@angular/common/http";
 
 @NgModule({
 	declarations: [
@@ -23,7 +24,8 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 		MatInputModule,
 		MatIconModule,
 		FormsModule,
-		ReactiveFormsModule
+		ReactiveFormsModule,
+		HttpClientModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]

@@ -8,6 +8,9 @@
 				<mat-error *ngIf="formControl.get('email').hasError('pattern') && !formControl.get('email').hasError('required')">
 					Please enter a valid email address
 				</mat-error>
+				<mat-error *ngIf="formControl.get('email').hasError('maxlength') && !formControl.get('email').hasError('pattern') && !formControl.get('email').hasError('required')">
+					Login to long
+				</mat-error>
 				<mat-error *ngIf="formControl.get('email').hasError('required')">
 					Email is <strong>required</strong>
 				</mat-error>
