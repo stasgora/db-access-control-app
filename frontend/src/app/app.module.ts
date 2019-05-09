@@ -4,15 +4,20 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { MatButtonModule, MatCardModule, MatCheckboxModule, MatIconModule, MatInputModule } from "@angular/material";
+import { MatButtonModule, MatCardModule, MatCheckboxModule, MatIconModule, MatInputModule, MatSidenavModule, MatSnackBarModule, MatToolbarModule, MatListModule } from "@angular/material";
 import { LoginScreenComponent } from './login-screen/login-screen.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
+import { ConsoleLoggerService } from "./services/console-logger.service";
+import { LoggerService } from "./services/logger.service";
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { LayoutModule } from '@angular/cdk/layout';
 
 @NgModule({
 	declarations: [
 		AppComponent,
-		LoginScreenComponent
+		LoginScreenComponent,
+		DashboardComponent
 	],
 	imports: [
 		BrowserModule,
@@ -25,9 +30,16 @@ import { HttpClientModule } from "@angular/common/http";
 		MatIconModule,
 		FormsModule,
 		ReactiveFormsModule,
-		HttpClientModule
+		HttpClientModule,
+		MatSnackBarModule,
+		MatSidenavModule,
+		LayoutModule,
+		MatToolbarModule,
+		MatListModule
 	],
-	providers: [],
+	providers: [
+		{ provide: LoggerService, useClass: ConsoleLoggerService }
+	],
 	bootstrap: [AppComponent]
 })
 export class AppModule {

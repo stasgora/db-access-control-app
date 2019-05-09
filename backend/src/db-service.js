@@ -5,6 +5,10 @@ import fs from 'fs';
 
 let db;
 
+const USER_EXISTS_QUERY = 'SELECT login FROM users WHERE login = ?';
+const USER_LOGIN_QUERY = USER_EXISTS_QUERY + ' AND password = ?';
+const CREATE_USER_QUERY = 'INSERT INTO users VALUES (?, ?)';
+
 module.exports = {
 	async connectToMariaDB() {
 		const dbConfig = JSON.parse(fs.readFileSync('db-config.json', 'utf8'));
@@ -17,10 +21,21 @@ module.exports = {
 		}
 	},
 	async doesUserExist(user) {
-		try {
-			const rows = await db.query('SELECT user FROM users WHERE user = ' + user)
-		} catch (err) {
-			console.error("Error while executing query: " + err);
-		}
+		return (await executeQuery(USER_EXISTS_QUERY, [user])).length === 1;
+	},
+	createUser(user, hash) {
+		return executeQuery(CREATE_USER_QUERY, [user, hash]);
+	},
+	async checkUserLogin(user, hash) {
+		return (await executeQuery(USER_LOGIN_QUERY, [user, hash])).length === 1;
 	}
 };
+
+function executeQuery(query, params) {
+	try {
+		return db.query(query, params);
+	} catch (err) {
+		console.error("Error while executing query: " + err);
+		throw err;
+	}
+}

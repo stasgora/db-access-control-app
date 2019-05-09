@@ -1,6 +1,6 @@
 <div id="bg">
 	<mat-card>
-		<mat-card-title>Sign in</mat-card-title>
+		<mat-card-title (click)="switchMode()">{{mode === Mode.SIGNIN ? 'Sign in' : 'Sign up'}}</mat-card-title>
 		<form [formGroup]="formControl">
 			<mat-form-field>
 				<mat-label>Email</mat-label>
@@ -13,6 +13,9 @@
 				</mat-error>
 				<mat-error *ngIf="formControl.get('email').hasError('required')">
 					Email is <strong>required</strong>
+				</mat-error>
+				<mat-error *ngIf="formControl.get('email').hasError('usernameTaken')">
+					Username already taken
 				</mat-error>
 			</mat-form-field>
 			<mat-form-field>
@@ -32,7 +35,7 @@
 		</form>
 		<mat-card-actions>
 			<button mat-raised-button color="primary" [disabled]="!formControl.valid"
-					(click)="loginService.login(formControl.get('email').value, formControl.get('password').value)">LOGIN
+					(click)="submit()">{{mode === Mode.SIGNIN ? 'LOGIN' : 'CREATE ACCOUNT'}}
 			</button>
 		</mat-card-actions>
 	</mat-card>

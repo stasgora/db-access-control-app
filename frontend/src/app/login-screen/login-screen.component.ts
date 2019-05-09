@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { LoginService } from "../services/login.service";
 import { FormBuilder, FormControl, FormGroupDirective, NgForm, Validators } from "@angular/forms";
-import { ErrorStateMatcher } from "@angular/material";
+import { ErrorStateMatcher, MatSnackBar } from "@angular/material";
+import { Router } from "@angular/router";
 
 @Component({
 	selector: 'app-login-screen',
@@ -9,6 +10,8 @@ import { ErrorStateMatcher } from "@angular/material";
 	styleUrls: ['./login-screen.component.scss']
 })
 export class LoginScreenComponent implements OnInit {
+	Mode = Mode;
+	private mode: Mode = Mode.SIGNIN;
 	private passwordHidden: boolean = true;
 
 	formControl = this.formBuilder.group({
@@ -22,11 +25,47 @@ export class LoginScreenComponent implements OnInit {
 	});
 	matcher = new EmailErrorStateMatcher();
 
-	constructor(private loginService: LoginService, private formBuilder: FormBuilder) {
+	constructor(private loginService: LoginService, private formBuilder: FormBuilder, private router: Router, private snackBar: MatSnackBar) {
 	}
 
 	ngOnInit() {
 	}
+
+	submit() {
+		if(this.mode === Mode.SIGNUP) {
+			this.loginService.signup(this.formControl.get('email').value, this.formControl.get('password').value).then(res => {
+				this.handleSubmitResponse(res, 409, 'usernameTaken', ErrorDisplayType.FORM);
+			});
+		} else {
+			this.loginService.login(this.formControl.get('email').value, this.formControl.get('password').value).then(res => {
+				this.handleSubmitResponse(res, 401, 'Invalid credentials', ErrorDisplayType.TOAST);
+			});
+		}
+	}
+
+	handleSubmitResponse(res: object, errorCodeCheck: number, error: string, errorDisplayType: ErrorDisplayType) {
+		if (res.hasOwnProperty('error') && res['error'].code === errorCodeCheck) {
+			errorDisplayType === ErrorDisplayType.FORM ?
+				this.formControl.controls['email'].setErrors({[error]: true}):
+				this.snackBar.open(error, 'OK', {duration: 4000});
+			return;
+		} else {
+			this.router.navigateByUrl('/dashboard');
+		}
+	}
+
+	switchMode() {
+		this.mode = -this.mode;
+		this.formControl.reset();
+	}
+}
+
+enum Mode {
+	SIGNIN = 1, SIGNUP = -1
+}
+
+enum ErrorDisplayType {
+	FORM, TOAST
 }
 
 export class EmailErrorStateMatcher implements ErrorStateMatcher {
