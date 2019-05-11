@@ -28,7 +28,7 @@ export class LoginService {
 			return res;
 		}).catch(err => {
 			this.logger.error('Request error ' + err);
-			return err;
+			throw err;
 		});
 	}
 

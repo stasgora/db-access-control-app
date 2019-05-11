@@ -39,7 +39,7 @@ export class LoginScreenComponent implements OnInit {
 		} else {
 			this.loginService.login(this.formControl.get('email').value, this.formControl.get('password').value).then(res => {
 				this.handleSubmitResponse(res, 401, 'Invalid credentials', ErrorDisplayType.TOAST);
-			});
+			}).catch(err => {});
 		}
 	}
 
