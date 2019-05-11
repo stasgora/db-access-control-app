@@ -14,7 +14,7 @@ router.post('/signup', async (req, res, next) => {
 			return res.send(getErrorResponse(409, "User already exists"));
 		}
 		await dbService.createUser(req.body.login, hash.update(req.body.password).digest('hex'));
-		res.status(201).send();
+		res.status(201).send(getSuccessResponse("created"));
 	} catch (err) {
 		next(err);
 	}
@@ -25,11 +25,15 @@ router.post('/login', async (req, res, next) => {
 		if(!await dbService.checkUserLogin(req.body.login, hash.update(req.body.password).digest('hex'))) {
 			return res.send(getErrorResponse(401, "Authentication failed"));
 		}
-		res.status(200).send();
+		res.status(200).send(getSuccessResponse("authorized"));
 	} catch (err) {
 		next(err);
 	}
 });
+
+function getSuccessResponse(message) {
+	return { status: message }
+}
 
 function getErrorResponse(code, message) {
 	return {

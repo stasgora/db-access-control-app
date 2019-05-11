@@ -44,13 +44,13 @@ export class LoginScreenComponent implements OnInit {
 	}
 
 	handleSubmitResponse(res: object, errorCodeCheck: number, error: string, errorDisplayType: ErrorDisplayType) {
-		if (res.hasOwnProperty('error') && res['error'].code === errorCodeCheck) {
+		if (res != null && res.hasOwnProperty('error') && res['error'].code === errorCodeCheck) {
 			errorDisplayType === ErrorDisplayType.FORM ?
 				this.formControl.controls['email'].setErrors({[error]: true}):
 				this.snackBar.open(error, 'OK', {duration: 4000});
 			return;
 		} else {
-			this.router.navigateByUrl('/dashboard');
+			this.router.navigateByUrl('/dashboard', {state: {'user': this.formControl.get('email').value}});
 		}
 	}
 
