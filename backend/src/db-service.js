@@ -8,6 +8,7 @@ let db;
 const USER_EXISTS_QUERY = 'SELECT login FROM users WHERE login = ?';
 const USER_LOGIN_QUERY = USER_EXISTS_QUERY + ' AND password = ?';
 const CREATE_USER_QUERY = 'INSERT INTO users VALUES (?, ?)';
+const SELECT_ALL_QUERY = 'SELECT * FROM Aquarium';
 
 module.exports = {
 	async connectToMariaDB() {
@@ -28,6 +29,9 @@ module.exports = {
 	},
 	async checkUserLogin(user, hash) {
 		return (await executeQuery(USER_LOGIN_QUERY, [user, hash])).length === 1;
+	},
+	async getTable(table) {
+		return executeQuery(SELECT_ALL_QUERY, [table]);
 	}
 };
 

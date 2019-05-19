@@ -30,6 +30,13 @@ router.post('/login', async (req, res, next) => {
 		next(err);
 	}
 });
+router.get('/table/get', async (req, res, next) => {
+	try {
+		res.status(200).send(await dbService.getTable(req.get('table')));
+	} catch (err) {
+		next(err);
+	}
+});
 
 function getSuccessResponse(message) {
 	return { status: message }

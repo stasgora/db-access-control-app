@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { LoggerService } from "./logger.service";
 
 @Injectable({
@@ -19,6 +19,13 @@ export class HttpClientService {
 			}
 			return res;
 		}).catch(err => {
+			this.logger.error('Request error ' + err);
+			return err;
+		});
+	}
+
+	public get(path: string, headers: HttpHeaders) {
+		return this.http.get(this.serverUri + path, {headers: headers}).toPromise().catch(err => {
 			this.logger.error('Request error ' + err);
 			return err;
 		});
