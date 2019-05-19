@@ -14,7 +14,7 @@ import {
 	MatSnackBarModule,
 	MatToolbarModule,
 	MatListModule,
-	MatDialogModule
+	MatDialogModule, MatTabsModule, MatTableModule
 } from "@angular/material";
 import { LoginScreenComponent } from './login-screen/login-screen.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -49,7 +49,9 @@ import { LogoutDialogComponent } from './logout-dialog/logout-dialog.component';
 		LayoutModule,
 		MatToolbarModule,
 		MatListModule,
-		MatDialogModule
+		MatDialogModule,
+		MatTabsModule,
+		MatTableModule
 	],
 	providers: [
 		{ provide: LoggerService, useClass: ConsoleLoggerService }

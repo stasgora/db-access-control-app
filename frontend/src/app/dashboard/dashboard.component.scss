@@ -7,5 +7,13 @@
 		.mat-toolbar {
 			background: inherit;
 		}
+		mat-nav-list {
+			span {
+				margin-left: 1em;
+			}
+		}
+	}
+	.tab {
+		padding: 1em;
 	}
 }

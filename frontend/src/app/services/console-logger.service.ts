@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { LoggerService } from "./logger.service";
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 
 export class ConsoleLoggerService extends LoggerService {

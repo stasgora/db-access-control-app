@@ -15,7 +15,7 @@ export class LogoutGuardService implements CanDeactivate<DashboardComponent> {
 
 	canDeactivate(component: DashboardComponent, currentRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState?: RouterStateSnapshot):
 		Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-		if(component.autoRedirect) {
+		if (component.autoRedirect) {
 			return true;
 		}
 		return this.dialog.open(LogoutDialogComponent).afterClosed().toPromise().then(res => {
