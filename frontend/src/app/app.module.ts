@@ -22,7 +22,6 @@ import { HttpClientModule } from "@angular/common/http";
 import { ConsoleLoggerService } from "./services/console-logger.service";
 import { LoggerService } from "./services/logger.service";
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { LayoutModule } from '@angular/cdk/layout';
 import { LogoutDialogComponent } from './logout-dialog/logout-dialog.component';
 
 @NgModule({
@@ -46,7 +45,6 @@ import { LogoutDialogComponent } from './logout-dialog/logout-dialog.component';
 		HttpClientModule,
 		MatSnackBarModule,
 		MatSidenavModule,
-		LayoutModule,
 		MatToolbarModule,
 		MatListModule,
 		MatDialogModule,

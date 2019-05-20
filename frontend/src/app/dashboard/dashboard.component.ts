@@ -18,6 +18,8 @@ export class DashboardComponent {
 		{icon: 'remove_circle', text: 'Remove'}
 	];
 	tabs = ['Aquarium', 'Fish', 'Workers'];
+	tableData = {};
+	columns = {};
 
 	constructor(private router: Router, private httpClient: HttpClientService) {
 		/*let navRoute = this.router.getCurrentNavigation();
@@ -26,8 +28,13 @@ export class DashboardComponent {
 			this.router.navigateByUrl('/login');
 			return
 		}*/
-		httpClient.get('/table/get', new HttpHeaders({'table': 'Aquarium'})).then(res => {
-			console.log(res);
+		this.tabs.forEach(tab => {
+			this.tableData[tab] = httpClient.get('/table/get', new HttpHeaders({'table': tab})).then(res => {
+				if(res.length > 0) {
+					this.columns[tab] = Object.keys(res[0]);
+				}
+				return res;
+			});
 		});
 	}
 }

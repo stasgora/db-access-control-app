@@ -21,8 +21,14 @@
 			<mat-tab-group mat-align-tabs="center" backgroundColor="primary">
 				<mat-tab *ngFor="let tab of tabs" label="{{tab}}">
 					<div class="tab">
-						<table>
-						</table>
+						<mat-table [dataSource]="tableData[tab] | async" class="mat-elevation-z8">
+							<ng-container *ngFor="let column of columns[tab]" matColumnDef="{{column}}">
+								<mat-header-cell *matHeaderCellDef>{{ column }}</mat-header-cell>
+								<mat-cell *matCellDef="let row">{{ row[column] }}</mat-cell>
+							</ng-container>
+							<mat-header-row *matHeaderRowDef="columns[tab]"></mat-header-row>
+							<mat-row *matRowDef="let row; columns: columns[tab];"></mat-row>
+						</mat-table>
 					</div>
 				</mat-tab>
 			</mat-tab-group>
