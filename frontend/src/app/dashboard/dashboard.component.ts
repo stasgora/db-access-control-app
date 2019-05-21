@@ -20,6 +20,7 @@ export class DashboardComponent {
 	tabs = ['Aquarium', 'Fish', 'Workers'];
 	tableData = {};
 	columns = {};
+	selectedRowID = {};
 
 	constructor(private router: Router, private httpClient: HttpClientService) {
 		/*let navRoute = this.router.getCurrentNavigation();
@@ -36,5 +37,9 @@ export class DashboardComponent {
 				return res;
 			});
 		});
+	}
+
+	rowSelected(event: any, row: any, tab: string) {
+		this.selectedRowID[tab] = row.ID;
 	}
 }
