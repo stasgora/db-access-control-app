@@ -22,14 +22,16 @@ import { HttpClientModule } from "@angular/common/http";
 import { ConsoleLoggerService } from "./services/console-logger.service";
 import { LoggerService } from "./services/logger.service";
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { LogoutDialogComponent } from './logout-dialog/logout-dialog.component';
+import { LogoutDialogComponent } from './dialogs/logout-dialog/logout-dialog.component';
+import { TableRowDialogComponent } from './dialogs/table-row-dialog/table-row-dialog.component';
 
 @NgModule({
 	declarations: [
 		AppComponent,
 		LoginScreenComponent,
 		DashboardComponent,
-		LogoutDialogComponent
+		LogoutDialogComponent,
+		TableRowDialogComponent
 	],
 	imports: [
 		BrowserModule,
@@ -55,7 +57,10 @@ import { LogoutDialogComponent } from './logout-dialog/logout-dialog.component';
 		{ provide: LoggerService, useClass: ConsoleLoggerService }
 	],
 	bootstrap: [AppComponent],
-	entryComponents: [LogoutDialogComponent]
+	entryComponents: [
+		LogoutDialogComponent,
+		TableRowDialogComponent
+	]
 })
 export class AppModule {
 }

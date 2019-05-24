@@ -1,3 +1,5 @@
+@import "../../styles.scss";
+
 .sidenav-container {
 	height: 100%;
 
@@ -17,7 +19,7 @@
 		margin: 3em;
 
 		.highlight{
-			background: #367436;
+			background: #455a64;
 		}
 	}
 }

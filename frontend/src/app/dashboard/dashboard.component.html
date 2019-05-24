@@ -4,9 +4,9 @@
 			<mat-toolbar>Menu</mat-toolbar>
 			<mat-nav-list>
 				<mat-list-item *ngFor="let item of menuItems">
-					<button mat-icon-button>
+					<button mat-icon-button (click)="menuItemClicked(item.type)">
 						<mat-icon color="accent">{{item.icon}}</mat-icon>
-						<span>{{item.text}}</span>
+						<span>{{formatMenuEntryText(item.type)}}</span>
 					</button>
 				</mat-list-item>
 			</mat-nav-list>
@@ -18,7 +18,7 @@
 				</button>
 				<span>Access Control Dashboard</span>
 			</mat-toolbar>
-			<mat-tab-group mat-align-tabs="center" backgroundColor="primary">
+			<mat-tab-group mat-align-tabs="center" backgroundColor="primary" (selectedTabChange)="tabChanged($event)">
 				<mat-tab *ngFor="let tab of tabs" label="{{tab}}">
 					<div class="tab">
 						<mat-table [dataSource]="tableData[tab] | async" class="mat-elevation-z8">
@@ -27,7 +27,7 @@
 								<mat-cell *matCellDef="let row">{{ row[column] }}</mat-cell>
 							</ng-container>
 							<mat-header-row *matHeaderRowDef="columns[tab]"></mat-header-row>
-							<mat-row *matRowDef="let row; columns: columns[tab];" (click)="rowSelected($event, row, tab)"
+							<mat-row *matRowDef="let row; columns: columns[tab];" (click)="rowSelected($event, row)"
 									 [ngClass]="{'highlight': selectedRowID[tab] == row.ID}"></mat-row>
 						</mat-table>
 					</div>

@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot, UrlTree } f
 import { DashboardComponent } from "../dashboard/dashboard.component";
 import { Observable } from "rxjs";
 import { MatDialog } from "@angular/material";
-import { LogoutDialogComponent, LogoutDialogResult } from "../logout-dialog/logout-dialog.component";
+import { LogoutDialogComponent, LogoutDialogResult } from "../dialogs/logout-dialog/logout-dialog.component";
 
 @Injectable({
 	providedIn: 'root'
