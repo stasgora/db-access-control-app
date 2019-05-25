@@ -1,4 +1,14 @@
-<h1 mat-dialog-title>{{type === DialogType.EDIT ? 'Edit row': 'Insert row'}}</h1>
-<div mat-dialog-actions>
-	<button mat-button [mat-dialog-close]="" cdkFocusInitial>Yes</button>
+<div>
+	<h1 mat-dialog-title>{{type === DialogType.EDIT ? 'Edit row': 'Insert row'}}</h1>
+	<mat-table [dataSource]="rowData" class="mat-elevation-z8">
+		<ng-container *ngFor="let column of columns" matColumnDef="{{column}}">
+			<mat-header-cell *matHeaderCellDef>{{ column }}</mat-header-cell>
+			<mat-cell *matCellDef="let row">{{ row[column] }}</mat-cell>
+		</ng-container>
+		<mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+		<mat-row *matRowDef="let row; columns: columns;"></mat-row>
+	</mat-table>
+	<div mat-dialog-actions>
+		<button mat-button [mat-dialog-close]="" cdkFocusInitial>Save</button>
+	</div>
 </div>

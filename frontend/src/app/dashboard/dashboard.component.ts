@@ -53,14 +53,21 @@ export class DashboardComponent {
 	menuItemClicked(item: MenuItem) {
 		switch (item) {
 			case MenuItem.ADD:
+				this.displayTableRowDialog(item, this.columns[this.selectedTab]);
+				break;
+			case MenuItem.EDIT:
 				if(this.selectedRowID[this.selectedTab] == null) {
 					break;
 				}
-				this.dialog.open(TableRowDialogComponent, {
-					data: {type: item, rowData: this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]]}
+				(this.tableData[this.selectedTab] as Promise<any>).then(rows => {
+					this.displayTableRowDialog(item, rows[this.selectedRowID[this.selectedTab] - 1]);
 				});
 				break;
 		}
+	}
+
+	displayTableRowDialog(item: MenuItem, data) {
+		this.dialog.open(TableRowDialogComponent, { data: {type: item, rowData: data} });
 	}
 
 	formatMenuEntryText(item: MenuItem): string {
