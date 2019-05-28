@@ -25,6 +25,7 @@ export class DashboardComponent {
 	];
 	tabs = ['Aquarium', 'Fish', 'Workers'];
 	selectedTab = this.tabs[0];
+	tableDataPromise = {};
 	tableData = {};
 	columns = {};
 	selectedRowID = {};
@@ -37,10 +38,11 @@ export class DashboardComponent {
 			return
 		}*/
 		this.tabs.forEach(tab => {
-			this.tableData[tab] = httpClient.get('/table/get', new HttpHeaders({'table': tab})).then(res => {
+			this.tableDataPromise[tab] = httpClient.get('/table/get', new HttpHeaders({'table': tab})).then(res => {
 				if(res.length > 0) {
 					this.columns[tab] = Object.keys(res[0]);
 				}
+				this.tableData[tab] = res;
 				return res;
 			});
 		});
@@ -59,9 +61,7 @@ export class DashboardComponent {
 				if(this.selectedRowID[this.selectedTab] == null) {
 					break;
 				}
-				(this.tableData[this.selectedTab] as Promise<any>).then(rows => {
-					this.displayTableRowDialog(item, rows[this.selectedRowID[this.selectedTab] - 1]);
-				});
+				this.displayTableRowDialog(item, this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab] - 1]);
 				break;
 		}
 	}

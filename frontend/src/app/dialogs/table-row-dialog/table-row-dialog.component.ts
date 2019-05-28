@@ -15,10 +15,12 @@ export class TableRowDialogComponent implements OnInit {
 	constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
 		this.type = data.type;
 		if(this.type == DialogType.EDIT) {
-			this.rowData = data.rowData;
-			this.columns = Object.keys(this.rowData);
+			this.rowData = [data.rowData];
+			this.columns = Object.keys(data.rowData);
 		} else {
 			this.columns = data.rowData;
+			this.rowData = [{}];
+			this.columns.forEach(column => this.rowData[0][column] = '');
 		}
 		console.log(this.columns);
 		console.log(this.rowData);
