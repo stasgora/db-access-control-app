@@ -3,8 +3,8 @@
 		<mat-sidenav #drawer class="sidenav" fixedInViewport="true" [mode]="mode.value">
 			<mat-toolbar>Menu</mat-toolbar>
 			<mat-nav-list>
-				<mat-list-item *ngFor="let item of menuItems">
-					<button mat-icon-button (click)="menuItemClicked(item.type)">
+				<mat-list-item *ngFor="let item of menuItems" (click)="menuItemClicked(item.type)">
+					<button mat-icon-button>
 						<mat-icon color="accent">{{item.icon}}</mat-icon>
 						<span>{{formatMenuEntryText(item.type)}}</span>
 					</button>

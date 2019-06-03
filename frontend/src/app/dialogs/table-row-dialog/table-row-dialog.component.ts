@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA } from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
 
 @Component({
 	selector: 'app-table-row-dialog',
@@ -12,7 +12,7 @@ export class TableRowDialogComponent implements OnInit {
 	columns;
 	rowData;
 
-	constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
+	constructor(@Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<TableRowDialogComponent>) {
 		this.type = data.type;
 		if(this.type == DialogType.EDIT) {
 			this.rowData = [data.rowData];
@@ -22,8 +22,7 @@ export class TableRowDialogComponent implements OnInit {
 			this.rowData = [{}];
 			this.columns.forEach(column => this.rowData[0][column] = '');
 		}
-		console.log(this.columns);
-		console.log(this.rowData);
+		this.columns.splice(0, 1);
 	}
 
 	ngOnInit() {

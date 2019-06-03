@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from "@angular/router";
 import { FormControl } from "@angular/forms";
 import { HttpClientService } from "../services/http-client.service";
 import { HttpHeaders } from "@angular/common/http";
-import { MatDialog, MatTabChangeEvent } from "@angular/material";
+import { MatDialog, MatTabChangeEvent, MatTableDataSource } from "@angular/material";
 import { TableRowDialogComponent } from "../dialogs/table-row-dialog/table-row-dialog.component";
 
 @Component({
@@ -30,7 +30,7 @@ export class DashboardComponent {
 	columns = {};
 	selectedRowID = {};
 
-	constructor(private router: Router, private httpClient: HttpClientService, public dialog: MatDialog) {
+	constructor(private router: Router, private httpClient: HttpClientService, public dialog: MatDialog, private changeDetectorRefs: ChangeDetectorRef) {
 		/*let navRoute = this.router.getCurrentNavigation();
 		if (navRoute == null || navRoute.extras.state == null || !navRoute.extras.state.hasOwnProperty('user')) {
 			this.autoRedirect = true;
@@ -41,9 +41,10 @@ export class DashboardComponent {
 			this.tableDataPromise[tab] = httpClient.get('/table/get', new HttpHeaders({'table': tab})).then(res => {
 				if(res.length > 0) {
 					this.columns[tab] = Object.keys(res[0]);
+					this.columns[tab].splice(0, 1);
 				}
 				this.tableData[tab] = res;
-				return res;
+				return new MatTableDataSource(res);
 			});
 		});
 	}
@@ -67,7 +68,14 @@ export class DashboardComponent {
 	}
 
 	displayTableRowDialog(item: MenuItem, data) {
-		this.dialog.open(TableRowDialogComponent, { data: {type: item, rowData: data} });
+		this.dialog.open(TableRowDialogComponent, { data: {type: item, rowData: data} }).afterClosed().subscribe(row => {
+			if(item == MenuItem.ADD) {
+				this.tableData[this.selectedTab].push(row);
+				(this.tableDataPromise[this.selectedTab] as Promise<any>).then(
+					table => (table as MatTableDataSource<any>).data = this.tableData[this.selectedTab]
+				);
+			}
+		});
 	}
 
 	formatMenuEntryText(item: MenuItem): string {
