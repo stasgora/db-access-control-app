@@ -17,4 +17,8 @@ export class DashboardService {
 	getTableContent(table: string): Promise<any> {
 		return this.httpClient.get('/table/get', new HttpHeaders({'table': table}));
 	}
+
+	getUserPermission(table: string){
+		return this.httpClient.get('/users/perm',  new HttpHeaders({'table': table}));
+	}
 }

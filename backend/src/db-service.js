@@ -39,6 +39,9 @@ module.exports = {
 	async checkUserLogin(user, hash) {
 		return (await executeQuery(USER_LOGIN_QUERY, [user, hash])).length === 1;
 	},
+	async getPermisionsForUser(table, user){
+		return executeQuery("SELECT Permission FROM "+ table + "Perm WHERE User LIKE" +"\""+user+"\"");
+	},
 	async getTable(table) {
 		return executeQuery(SELECT_TABLE_QUERY + ' `' + table + '`');
 	},

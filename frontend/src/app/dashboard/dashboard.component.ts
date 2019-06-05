@@ -26,6 +26,7 @@ export class DashboardComponent {
 		{icon: 'forward', type: MenuItem.OWNERSHIP},
 	];
 	tabs = ['Aquarium', 'Fish', 'Workers'];
+	userTabs = ['Aquarium', 'Fish', 'Workers'];
 	selectedTab = this.tabs[0];
 	tableDataPromise = {};
 	tableData = {};
@@ -39,6 +40,17 @@ export class DashboardComponent {
 			this.router.navigateByUrl('/login');
 			return
 		}*/
+
+		this.tabs.forEach(tab =>{
+			this.dashboard.getUserPermission(tab).then( resp => {
+				var perms = resp.error.text; // in error field because of passing just string
+				if(perms.toString().includes("r")){
+					var index = this.tabs.indexOf(tab);
+					if(index !== -1)this.tabs.splice(index, 1);
+				}
+			});
+		});
+
 		this.tabs.forEach(tab => {
 			this.tableDataPromise[tab] = this.dashboard.getTableContent(tab).then(res => {
 				if(res.length > 0) {

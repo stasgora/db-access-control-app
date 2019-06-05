@@ -5,6 +5,7 @@ import dbService from './db-service.js';
 
 const router = express.Router();
 const crypto = require('crypto');
+var loggedUser;
 
 router.get('/', (req, res) => res.send('Express server API'));
 router.post('/users/add', async (req, res, next) => {
@@ -22,6 +23,7 @@ router.post('/users/add', async (req, res, next) => {
 });
 router.post('/users/check', async (req, res, next) => {
 	try {
+		loggedUser = req.body.login;
 		const hash = crypto.createHash('sha512');
 		if(!await dbService.checkUserLogin(req.body.login, hash.update(req.body.password).digest('hex'))) {
 			return res.send(getErrorResponse(401, "Authentication failed"));
@@ -38,6 +40,15 @@ router.get('/users/get', async (req, res, next) => {
 		next(err);
 	}
 });
+router.get('/users/perm', async(req, res, next) => {
+	try{
+		var perm = await dbService.getPermisionsForUser(req.get('table'), loggedUser);
+		res.status(200).send(perm[0].Permission);
+	}catch(err){
+		next(err);
+	}
+});
+
 router.get('/table/get', async (req, res, next) => {
 	try {
 		res.status(200).send(await dbService.getTable(req.get('table')));
