@@ -7,7 +7,7 @@ const router = express.Router();
 const crypto = require('crypto');
 
 router.get('/', (req, res) => res.send('Express server API'));
-router.post('/signup', async (req, res, next) => {
+router.post('/users/add', async (req, res, next) => {
 	try {
 		const hash = crypto.createHash('sha512');
 		if(await dbService.doesUserExist(req.body.login)) {
@@ -19,13 +19,20 @@ router.post('/signup', async (req, res, next) => {
 		next(err);
 	}
 });
-router.post('/login', async (req, res, next) => {
+router.post('/users/check', async (req, res, next) => {
 	try {
 		const hash = crypto.createHash('sha512');
 		if(!await dbService.checkUserLogin(req.body.login, hash.update(req.body.password).digest('hex'))) {
 			return res.send(getErrorResponse(401, "Authentication failed"));
 		}
 		res.status(200).send(getSuccessResponse("authorized"));
+	} catch (err) {
+		next(err);
+	}
+});
+router.get('/users/get', async (req, res, next) => {
+	try {
+		res.status(200).send(await dbService.getAllUsers());
 	} catch (err) {
 		next(err);
 	}

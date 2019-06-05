@@ -50,6 +50,7 @@ export class LoginScreenComponent implements OnInit {
 				this.snackBar.open(error, 'OK', {duration: 4000});
 			return;
 		} else {
+			localStorage.setItem("user", this.formControl.get('email').value);
 			this.router.navigateByUrl('/dashboard', {state: {'user': this.formControl.get('email').value}});
 		}
 	}

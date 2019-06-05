@@ -5,6 +5,8 @@ import { HttpClientService } from "../services/http-client.service";
 import { HttpHeaders } from "@angular/common/http";
 import { MatDialog, MatTabChangeEvent, MatTableDataSource } from "@angular/material";
 import { TableRowDialogComponent } from "../dialogs/table-row-dialog/table-row-dialog.component";
+import { DashboardService } from "../services/dashboard.service";
+import { UserListDialogComponent } from "../dialogs/user-list-dialog/user-list-dialog.component";
 
 @Component({
 	selector: 'app-dashboard',
@@ -20,7 +22,7 @@ export class DashboardComponent {
 		{icon: 'add_circle', type: MenuItem.ADD},
 		{icon: 'edit', type: MenuItem.EDIT},
 		{icon: 'remove_circle', type: MenuItem.REMOVE},
-		{icon: 'https', type: MenuItem.PERMISIONS},
+		{icon: 'https', type: MenuItem.PERMISSIONS},
 		{icon: 'forward', type: MenuItem.OWNERSHIP},
 	];
 	tabs = ['Aquarium', 'Fish', 'Workers'];
@@ -30,7 +32,7 @@ export class DashboardComponent {
 	columns = {};
 	selectedRowID = {};
 
-	constructor(private router: Router, private httpClient: HttpClientService, public dialog: MatDialog, private changeDetectorRefs: ChangeDetectorRef) {
+	constructor(private router: Router, private dashboard: DashboardService, public dialog: MatDialog, private changeDetectorRefs: ChangeDetectorRef) {
 		/*let navRoute = this.router.getCurrentNavigation();
 		if (navRoute == null || navRoute.extras.state == null || !navRoute.extras.state.hasOwnProperty('user')) {
 			this.autoRedirect = true;
@@ -38,7 +40,7 @@ export class DashboardComponent {
 			return
 		}*/
 		this.tabs.forEach(tab => {
-			this.tableDataPromise[tab] = httpClient.get('/table/get', new HttpHeaders({'table': tab})).then(res => {
+			this.tableDataPromise[tab] = this.dashboard.getTableContent(tab).then(res => {
 				if(res.length > 0) {
 					this.columns[tab] = Object.keys(res[0]);
 					this.columns[tab].splice(0, 1);
@@ -54,15 +56,32 @@ export class DashboardComponent {
 	}
 
 	menuItemClicked(item: MenuItem) {
+		if((item == MenuItem.EDIT || item == MenuItem.REMOVE) && this.selectedRowID[this.selectedTab] == null) {
+			return;
+		}
 		switch (item) {
 			case MenuItem.ADD:
 				this.displayTableRowDialog(item, this.columns[this.selectedTab]);
 				break;
 			case MenuItem.EDIT:
-				if(this.selectedRowID[this.selectedTab] == null) {
-					break;
-				}
 				this.displayTableRowDialog(item, this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab] - 1]);
+				break;
+			case MenuItem.PERMISSIONS:
+				break;
+			case MenuItem.REMOVE:
+				this.tableData[this.selectedTab].splice(this.selectedRowID[this.selectedTab] - 1, 1);
+				this.selectedRowID[this.selectedTab] = null;
+				this.refreshTableData();
+				break;
+			case MenuItem.OWNERSHIP:
+				this.dashboard.getAllUsers().then(users => {
+					users = users.map(user => user.login);
+					let index = users.indexOf(localStorage.getItem("user"));
+					if (index !== -1) users.splice(index, 1);
+					this.dialog.open(UserListDialogComponent, { data: users}).afterClosed().subscribe(user => {
+						console.log(user);
+					});
+				});
 				break;
 		}
 	}
@@ -71,11 +90,15 @@ export class DashboardComponent {
 		this.dialog.open(TableRowDialogComponent, { data: {type: item, rowData: data} }).afterClosed().subscribe(row => {
 			if(item == MenuItem.ADD) {
 				this.tableData[this.selectedTab].push(row);
-				(this.tableDataPromise[this.selectedTab] as Promise<any>).then(
-					table => (table as MatTableDataSource<any>).data = this.tableData[this.selectedTab]
-				);
+				this.refreshTableData();
 			}
 		});
+	}
+
+	refreshTableData() {
+		(this.tableDataPromise[this.selectedTab] as Promise<any>).then(
+			table => (table as MatTableDataSource<any>).data = this.tableData[this.selectedTab]
+		);
 	}
 
 	formatMenuEntryText(item: MenuItem): string {
@@ -89,5 +112,5 @@ export class DashboardComponent {
 }
 
 export enum MenuItem {
-	ADD, EDIT, REMOVE, PERMISIONS, OWNERSHIP
+	ADD, EDIT, REMOVE, PERMISSIONS, OWNERSHIP
 }

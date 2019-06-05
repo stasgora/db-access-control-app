@@ -1,0 +1,14 @@
+<div>
+	<mat-form-field>
+		<mat-label>Transfer Ownership to</mat-label>
+		<mat-select [(ngModel)]="selectedUser">
+			<mat-option *ngFor="let user of users" value="{{user}}">
+				{{user}}
+			</mat-option>
+		</mat-select>
+	</mat-form-field>
+	<div mat-dialog-actions align="end">
+		<button mat-button (click)="this.dialogRef.close()">Cancel</button>
+		<button mat-button [mat-dialog-close]="selectedUser">Save</button>
+	</div>
+</div>

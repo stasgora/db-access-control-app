@@ -14,7 +14,7 @@ import {
 	MatSnackBarModule,
 	MatToolbarModule,
 	MatListModule,
-	MatDialogModule, MatTabsModule, MatTableModule
+	MatDialogModule, MatTabsModule, MatTableModule, MatSelectModule
 } from "@angular/material";
 import { LoginScreenComponent } from './login-screen/login-screen.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -24,6 +24,7 @@ import { LoggerService } from "./services/logger.service";
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LogoutDialogComponent } from './dialogs/logout-dialog/logout-dialog.component';
 import { TableRowDialogComponent } from './dialogs/table-row-dialog/table-row-dialog.component';
+import { UserListDialogComponent } from './dialogs/user-list-dialog/user-list-dialog.component';
 
 @NgModule({
 	declarations: [
@@ -31,7 +32,8 @@ import { TableRowDialogComponent } from './dialogs/table-row-dialog/table-row-di
 		LoginScreenComponent,
 		DashboardComponent,
 		LogoutDialogComponent,
-		TableRowDialogComponent
+		TableRowDialogComponent,
+		UserListDialogComponent
 	],
 	imports: [
 		BrowserModule,
@@ -51,7 +53,8 @@ import { TableRowDialogComponent } from './dialogs/table-row-dialog/table-row-di
 		MatListModule,
 		MatDialogModule,
 		MatTabsModule,
-		MatTableModule
+		MatTableModule,
+		MatSelectModule
 	],
 	providers: [
 		{ provide: LoggerService, useClass: ConsoleLoggerService }
@@ -59,7 +62,8 @@ import { TableRowDialogComponent } from './dialogs/table-row-dialog/table-row-di
 	bootstrap: [AppComponent],
 	entryComponents: [
 		LogoutDialogComponent,
-		TableRowDialogComponent
+		TableRowDialogComponent,
+		UserListDialogComponent
 	]
 })
 export class AppModule {

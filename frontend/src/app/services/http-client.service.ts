@@ -24,7 +24,7 @@ export class HttpClientService {
 		});
 	}
 
-	public get(path: string, headers: HttpHeaders) {
+	public get(path: string, headers: HttpHeaders = new HttpHeaders()) {
 		return this.http.get(this.serverUri + path, {headers: headers}).toPromise().catch(err => {
 			this.logger.error('Request error ' + err);
 			return err;

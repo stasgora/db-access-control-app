@@ -10,11 +10,11 @@ export class LoginService {
 	}
 
 	public login(username: string, password: string): Promise<object> {
-		return this.httpClient.post('/login', {login: username, password: password});
+		return this.httpClient.post('/users/check', {login: username, password: password});
 	}
 
 	public signup(username: string, password: string): Promise<object> {
-		return this.httpClient.post('/signup', {login: username, password: password});
+		return this.httpClient.post('/users/add', {login: username, password: password});
 	}
 
 }
