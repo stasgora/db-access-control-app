@@ -10,6 +10,7 @@ const USER_LOGIN_QUERY = USER_EXISTS_QUERY + ' AND password = ?';
 const SELECT_ALL_USERS_QUERY = 'SELECT login FROM users';
 const CREATE_USER_QUERY = 'INSERT INTO users VALUES (?, ?)';
 
+const NEW_USER_PERMISSION_QUERY = 'Perm(User, Permission) VALUES (?, \'Rwud\')'; // rwud - Read/Write/Update/Delete, caps - can
 const SELECT_TABLE_QUERY = 'SELECT * FROM';
 
 module.exports = {
@@ -28,6 +29,12 @@ module.exports = {
 	},
 	createUser(user, hash) {
 		return executeQuery(CREATE_USER_QUERY, [user, hash]);
+	},
+	createBasicUserPermissions(user){
+		var tables = ['Aquarium', 'Fish', 'Workers'];
+		tables.forEach( table =>{
+			executeQuery('INSERT INTO ' + table + NEW_USER_PERMISSION_QUERY, [user]);
+		})
 	},
 	async checkUserLogin(user, hash) {
 		return (await executeQuery(USER_LOGIN_QUERY, [user, hash])).length === 1;

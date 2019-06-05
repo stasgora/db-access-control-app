@@ -14,7 +14,8 @@ router.post('/users/add', async (req, res, next) => {
 			return res.send(getErrorResponse(409, "User already exists"));
 		}
 		await dbService.createUser(req.body.login, hash.update(req.body.password).digest('hex'));
-		res.status(201).send(getSuccessResponse("created"));
+		await dbService.createBasicUserPermissions(req.body.login);
+		res.status(201).send(getSuccessResponse("User created and basic permissions granted"));
 	} catch (err) {
 		next(err);
 	}
