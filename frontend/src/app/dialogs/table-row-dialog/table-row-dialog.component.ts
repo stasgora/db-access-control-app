@@ -15,14 +15,14 @@ export class TableRowDialogComponent implements OnInit {
 	constructor(@Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<TableRowDialogComponent>) {
 		this.type = data.type;
 		if(this.type == DialogType.EDIT) {
-			this.rowData = [data.rowData];
+			this.rowData = [JSON.parse(JSON.stringify(data.rowData))];
 			this.columns = Object.keys(data.rowData);
+			this.columns.splice(0, 1);
 		} else {
 			this.columns = data.rowData;
 			this.rowData = [{}];
 			this.columns.forEach(column => this.rowData[0][column] = '');
 		}
-		this.columns.splice(0, 1);
 	}
 
 	ngOnInit() {

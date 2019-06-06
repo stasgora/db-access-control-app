@@ -64,7 +64,7 @@ export class DashboardComponent {
 	}
 
 	rowSelected(event: any, row: any) {
-		this.selectedRowID[this.selectedTab] = row.ID;
+		this.selectedRowID[this.selectedTab] = this.tableData[this.selectedTab].indexOf(row);
 	}
 
 	menuItemClicked(item: MenuItem) {
@@ -76,12 +76,12 @@ export class DashboardComponent {
 				this.displayTableRowDialog(item, this.columns[this.selectedTab]);
 				break;
 			case MenuItem.EDIT:
-				this.displayTableRowDialog(item, this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab] - 1]);
+				this.displayTableRowDialog(item, this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]]);
 				break;
 			case MenuItem.PERMISSIONS:
 				break;
 			case MenuItem.REMOVE:
-				this.tableData[this.selectedTab].splice(this.selectedRowID[this.selectedTab] - 1, 1);
+				this.tableData[this.selectedTab].splice(this.selectedRowID[this.selectedTab], 1);
 				this.selectedRowID[this.selectedTab] = null;
 				this.refreshTableData();
 				break;
@@ -104,8 +104,10 @@ export class DashboardComponent {
 				this.tableData[this.selectedTab].push(row);
 				let tableData = JSON.stringify(row);
 				this.dashboard.insertIntoTable(this.selectedTab, tableData);
-				this.refreshTableData();
+			} else if(row != null) {
+				this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]] = row;
 			}
+			this.refreshTableData();
 		});
 	}
 
