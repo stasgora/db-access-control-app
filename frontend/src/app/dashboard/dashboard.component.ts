@@ -102,6 +102,8 @@ export class DashboardComponent {
 		this.dialog.open(TableRowDialogComponent, { data: {type: item, rowData: data} }).afterClosed().subscribe(row => {
 			if(item == MenuItem.ADD) {
 				this.tableData[this.selectedTab].push(row);
+				let tableData = JSON.stringify(row);
+				this.dashboard.insertIntoTable(this.selectedTab, tableData);
 				this.refreshTableData();
 			}
 		});

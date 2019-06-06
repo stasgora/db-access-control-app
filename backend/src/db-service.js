@@ -10,6 +10,10 @@ const USER_LOGIN_QUERY = USER_EXISTS_QUERY + ' AND password = ?';
 const SELECT_ALL_USERS_QUERY = 'SELECT login FROM users';
 const CREATE_USER_QUERY = 'INSERT INTO users VALUES (?, ?)';
 
+const INSERT_FISH_QUERY = 'INSERT INTO Fish(Species, Name, Size, Color, Tank_ID) VALUES (?, ?, ?, ?, ?)';
+const INSERT_AQUARIUM_QUERY = 'INSERT INTO Aquarium(Size, Volume, Material, Assignee_ID) VALUES (?, ?, ?, ?)';
+const INSERT_WORKER_QUERY = 'INSERT INTO Workers(Name, Surename, Age, Salary) VALUES (?, ?, ?, ?)';
+
 const NEW_USER_PERMISSION_QUERY = 'Perm(User, Permission) VALUES (?, \'Rwud\')'; // rwud - Read/Write/Update/Delete, caps - can
 const SELECT_TABLE_QUERY = 'SELECT * FROM';
 
@@ -26,6 +30,15 @@ module.exports = {
 	},
 	async doesUserExist(user) {
 		return (await executeQuery(USER_EXISTS_QUERY, [user])).length === 1;
+	},
+	async insertIntoTableData(table, data){
+		let values = JSON.parse(data);
+		console.log(values);
+		if(table === 'Fish')return (await executeQuery(INSERT_FISH_QUERY, [values.Species, values.Name, values.Size, values.Color, parseInt(values.Tank_ID,10)]));
+		else if(table === 'Aquarium')return (await executeQuery(INSERT_AQUARIUM_QUERY, [values.Size, parseInt(values.Volume, 10), values.Material, parseInt(values.Assignee_ID, 10)]));
+		else {
+			return (await executeQuery(INSERT_WORKER_QUERY, [values.Name, valuse.Surename, parseInt(values.Age,10), parseInt(values.Salary,10)]));
+		}
 	},
 	createUser(user, hash) {
 		return executeQuery(CREATE_USER_QUERY, [user, hash]);

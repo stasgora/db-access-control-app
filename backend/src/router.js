@@ -5,7 +5,7 @@ import dbService from './db-service.js';
 
 const router = express.Router();
 const crypto = require('crypto');
-var loggedUser;
+var loggedUser = "admin@admin.com";
 
 router.get('/', (req, res) => res.send('Express server API'));
 router.post('/users/add', async (req, res, next) => {
@@ -33,6 +33,16 @@ router.post('/users/check', async (req, res, next) => {
 		next(err);
 	}
 });
+
+router.get('/table/insert', async (req, res, next) => {
+	try {
+		await dbService.insertIntoTableData(req.get('table'), req.get('row'));
+		res.status(200).send(getSuccessResponse("inserted data"));
+	} catch (err) {
+		next(err);
+	}
+});
+
 router.get('/users/get', async (req, res, next) => {
 	try {
 		res.status(200).send(await dbService.getAllUsers());
