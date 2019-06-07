@@ -5,7 +5,7 @@ import dbService from './db-service.js';
 
 const router = express.Router();
 const crypto = require('crypto');
-var loggedUser = "admin@admin.com";
+var loggedUser;// = "admin@admin.com";
 
 router.get('/', (req, res) => res.send('Express server API'));
 router.post('/users/add', async (req, res, next) => {
