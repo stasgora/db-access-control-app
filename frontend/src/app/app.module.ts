@@ -14,7 +14,7 @@ import {
 	MatSnackBarModule,
 	MatToolbarModule,
 	MatListModule,
-	MatDialogModule, MatTabsModule, MatTableModule, MatSelectModule
+	MatDialogModule, MatTabsModule, MatTableModule, MatSelectModule, MatSlideToggleModule
 } from "@angular/material";
 import { LoginScreenComponent } from './login-screen/login-screen.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -54,7 +54,8 @@ import { UserListDialogComponent } from './dialogs/user-list-dialog/user-list-di
 		MatDialogModule,
 		MatTabsModule,
 		MatTableModule,
-		MatSelectModule
+		MatSelectModule,
+		MatSlideToggleModule
 	],
 	providers: [
 		{ provide: LoggerService, useClass: ConsoleLoggerService }

@@ -74,7 +74,6 @@ router.get('/users/perm', async(req, res, next) => {
 		var perm = await dbService.getPermisionsForUser(req.get('table'), req.get('user'));
 		res.status(200).send({'permissions': perm[0].Permission});
 	}catch(err){
-		console.log(err);
 		next(err);
 	}
 });

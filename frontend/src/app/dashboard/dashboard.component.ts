@@ -1,12 +1,10 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from "@angular/router";
 import { FormControl } from "@angular/forms";
-import { HttpClientService } from "../services/http-client.service";
-import { HttpHeaders } from "@angular/common/http";
 import { MatDialog, MatTabChangeEvent, MatTableDataSource } from "@angular/material";
 import { TableRowDialogComponent } from "../dialogs/table-row-dialog/table-row-dialog.component";
 import { DashboardService } from "../services/dashboard.service";
-import { UserListDialogComponent } from "../dialogs/user-list-dialog/user-list-dialog.component";
+import { UserDialogType, UserListDialogComponent } from "../dialogs/user-list-dialog/user-list-dialog.component";
 
 @Component({
 	selector: 'app-dashboard',
@@ -84,6 +82,7 @@ export class DashboardComponent {
 				this.displayTableRowDialog(item, this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]]);
 				break;
 			case MenuItem.PERMISSIONS:
+				this.displayUserDialog(item);
 				break;
 			case MenuItem.REMOVE:
 				this.tableData[this.selectedTab].splice(this.selectedRowID[this.selectedTab], 1);
@@ -93,12 +92,7 @@ export class DashboardComponent {
 				this.refreshTableData();
 				break;
 			case MenuItem.OWNERSHIP:
-				this.dashboard.getAllUsers().then(users => {
-					users = users.map(user => user.login);
-					let index = users.indexOf(localStorage.getItem("user"));
-					if (index !== -1) users.splice(index, 1);
-					this.displayUserDialog(item, users);
-				});
+				this.displayUserDialog(item);
 				break;
 		}
 	}
@@ -118,9 +112,16 @@ export class DashboardComponent {
 		});
 	}
 
-	displayUserDialog(item: MenuItem, users: [string]) {
-		this.dialog.open(UserListDialogComponent, { data: {type: item, users: users} }).afterClosed().subscribe(val => {
+	displayUserDialog(item: MenuItem) {
+		this.dashboard.getAllUsers().then(users => {
+			users = users.map(user => user.login);
+			let index = users.indexOf(localStorage.getItem("user"));
+			if (index !== -1) users.splice(index, 1);
 
+			let type: UserDialogType = item == MenuItem.OWNERSHIP ? UserDialogType.CHOOSE : UserDialogType.PERMISSIONS;
+			this.dialog.open(UserListDialogComponent, { data: {type: type, users: users} }).afterClosed().subscribe(val => {
+				console.log(val);
+			});
 		});
 	}
 
