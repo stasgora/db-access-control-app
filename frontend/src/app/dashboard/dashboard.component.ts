@@ -61,6 +61,8 @@ export class DashboardComponent {
 				return new MatTableDataSource(res);
 			});
 		});
+
+		this.checkMenuItemsForTable();
 	}
 
 	rowSelected(event: any, row: any) {
@@ -115,6 +117,43 @@ export class DashboardComponent {
 		});
 	}
 
+	checkMenuItemsForTable(){
+		this.menuItems = [
+			{icon: 'add_circle', type: MenuItem.ADD},
+			{icon: 'edit', type: MenuItem.EDIT},
+			{icon: 'remove_circle', type: MenuItem.REMOVE},
+			{icon: 'https', type: MenuItem.PERMISSIONS},
+			{icon: 'forward', type: MenuItem.OWNERSHIP},
+		];
+		this.dashboard.getUserPermission(this.selectedTab).then( resp => {
+			var perms = resp.error.text; // in error field because of passing just string
+			this.menuItems.forEach( item=> {
+				if (item.type === MenuItem.ADD) {
+					if (perms.toString().includes("w")) {
+						let index = this.menuItems.indexOf(item);
+						if (index !== -1) this.menuItems.splice(index, 1);
+					}
+				}
+			});
+			this.menuItems.forEach( item=> {
+				if (item.type === MenuItem.EDIT) {
+					if (perms.toString().includes("u")) {
+						let index = this.menuItems.indexOf(item);
+						if (index !== -1) this.menuItems.splice(index, 1);
+					}
+				}
+			});
+			this.menuItems.forEach( item=> {
+				if (item.type === MenuItem.REMOVE) {
+					if (perms.toString().includes("d")) {
+						let index = this.menuItems.indexOf(item);
+						if (index !== -1) this.menuItems.splice(index, 1);
+					}
+				}
+			});
+		});
+	}
+
 	refreshTableData() {
 		(this.tableDataPromise[this.selectedTab] as Promise<any>).then(
 			table => (table as MatTableDataSource<any>).data = this.tableData[this.selectedTab]
@@ -128,6 +167,7 @@ export class DashboardComponent {
 
 	tabChanged(event: MatTabChangeEvent) {
 		this.selectedTab = this.tabs[event.index];
+		this.checkMenuItemsForTable();
 	}
 }
 
