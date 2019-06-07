@@ -26,7 +26,6 @@ export class DashboardComponent {
 		{icon: 'forward', type: MenuItem.OWNERSHIP},
 	];
 	tabs = ['Aquarium', 'Fish', 'Workers'];
-	userTabs = ['Aquarium', 'Fish', 'Workers'];
 	selectedTab = this.tabs[0];
 	tableDataPromise = {};
 	tableData = {};
