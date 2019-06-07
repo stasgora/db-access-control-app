@@ -21,6 +21,8 @@ const WHERE_ID_CLAUSE_QUERY = ' WHERE ID LIKE ?';
 
 const DELETE_FROM_QUERY = 'DELETE FROM ';
 
+const TABLE_OWNER_QUERY = 'SELECT Owner FROM TableOwners WHERE TableName LIKE ?';
+
 const NEW_USER_PERMISSION_QUERY = 'Perm(User, Permission) VALUES (?, \'Rwud\')'; // rwud - Read/Write/Update/Delete, caps - can
 const SELECT_TABLE_QUERY = 'SELECT * FROM';
 
@@ -53,11 +55,21 @@ module.exports = {
 		if(table === 'Fish')return (await executeQuery(UPDATE_FISH_QUERY + WHERE_ID_CLAUSE_QUERY, [values.Species, values.Name, values.Size, values.Color, parseInt(values.Tank_ID,10), values.ID]));
 		else if(table === 'Aquarium')return (await executeQuery(UPDATE_AQUARIUM_QUERY + WHERE_ID_CLAUSE_QUERY, [values.Size, parseInt(values.Volume, 10), values.Material, parseInt(values.Assignee_ID, 10), values.ID]));
 		else {
-			return (await executeQuery(UPDATE_WORKERS_QUERY + WHERE_ID_CLAUSE_QUERY, [values.Name, valuse.Surename, parseInt(values.Age,10), parseInt(values.Salary,10), values.ID]));
+			return (await executeQuery(UPDATE_WORKERS_QUERY + WHERE_ID_CLAUSE_QUERY, [values.Name, values.Surename, parseInt(values.Age,10), parseInt(values.Salary,10), values.ID]));
 		}
 	},
 	async deleteTableData(table, data){
 		return (await executeQuery(DELETE_FROM_QUERY + table + WHERE_ID_CLAUSE_QUERY, [parseInt(data,10)]));
+	},
+	async grantPermissionToUser(table, data){
+		console.log(data);
+		let values = JSON.parse(data);
+		let perm = "";
+		perm += (values.R === true) ? 'R' : 'r';
+		perm += (values.W === true) ? 'W' : 'w';
+		perm += (values.U === true) ? 'U' : 'u';
+		perm += (values.D === true) ? 'D' : 'd';
+		return (await executeQuery("UPDATE " + table + "Perm SET Permission=? WHERE user LIKE ?", [perm, values.user]));
 	},
 	createUser(user, hash) {
 		return executeQuery(CREATE_USER_QUERY, [user, hash]);
@@ -73,6 +85,9 @@ module.exports = {
 	},
 	async getPermisionsForUser(table, user){
 		return executeQuery("SELECT Permission FROM "+ table + "Perm WHERE User LIKE" +"\""+user+"\"");
+	},
+	async getTableOwner(table){
+		return (await executeQuery(TABLE_OWNER_QUERY, [table]));
 	},
 	async getTable(table) {
 		return executeQuery(SELECT_TABLE_QUERY + ' `' + table + '`');

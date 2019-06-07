@@ -14,6 +14,10 @@ export class DashboardService {
 		return this.httpClient.get('/users/get');
 	}
 
+	getTableOwner(table: string){
+		return this.httpClient.get('/table/owner', new HttpHeaders({'table': table}));
+	}
+
 	getTableContent(table: string): Promise<any> {
 		return this.httpClient.get('/table/get', new HttpHeaders({'table': table}));
 	}
@@ -31,4 +35,9 @@ export class DashboardService {
 	deleteTableData(table: string, row: string){
 		return this.httpClient.get('/table/delete',  new HttpHeaders({'table': table, 'row': row }));
 	}
+
+	grantUserPermission(table: string, row: string){
+		return this.httpClient.get('/table/grant',  new HttpHeaders({'table': table, 'row': row }));
+	}
+
 }

@@ -62,6 +62,15 @@ router.get('/table/delete', async (req, res, next) => {
 	}
 });
 
+router.get('/table/grant', async (req, res, next) => {
+	try{
+		await dbService.grantPermissionToUser(req.get('table'), req.get('row'));
+		res.status(200).send(getSuccessResponse("granted permissions"));
+	}catch(err){
+		next(err);
+	}
+});
+
 router.get('/users/get', async (req, res, next) => {
 	try {
 		res.status(200).send(await dbService.getAllUsers());
@@ -69,6 +78,16 @@ router.get('/users/get', async (req, res, next) => {
 		next(err);
 	}
 });
+
+
+router.get('/table/owner', async (req, res, next) => {
+	try {
+		res.status(200).send(await dbService.getTableOwner(req.get('table')));
+	} catch (err) {
+		next(err);
+	}
+});
+
 router.get('/users/perm', async(req, res, next) => {
 	try{
 		var perm = await dbService.getPermisionsForUser(req.get('table'), req.get('user'));

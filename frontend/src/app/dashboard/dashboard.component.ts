@@ -121,6 +121,9 @@ export class DashboardComponent {
 			let type: UserDialogType = item == MenuItem.OWNERSHIP ? UserDialogType.CHOOSE : UserDialogType.PERMISSIONS;
 			this.dialog.open(UserListDialogComponent, { data: {type: type, users: users} }).afterClosed().subscribe(val => {
 				console.log(val);
+				if(item == MenuItem.PERMISSIONS){
+					this.dashboard.grantUserPermission(this.selectedTab, JSON.stringify(val));
+				}
 			});
 		});
 	}
@@ -159,6 +162,22 @@ export class DashboardComponent {
 					}
 				}
 			});
+		});
+		this.dashboard.getTableOwner(this.selectedTab).then( resp => {
+			if(this.getLoggedUser() !== resp[0].Owner){
+				this.menuItems.forEach( item=> {
+					if (item.type === MenuItem.PERMISSIONS) {
+						let index = this.menuItems.indexOf(item);
+						if (index !== -1) this.menuItems.splice(index, 1);
+					}
+				});
+				this.menuItems.forEach( item=> {
+					if (item.type === MenuItem.OWNERSHIP) {
+						let index = this.menuItems.indexOf(item);
+						if (index !== -1) this.menuItems.splice(index, 1);
+					}
+				});
+			}
 		});
 	}
 
