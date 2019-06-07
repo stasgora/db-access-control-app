@@ -82,6 +82,8 @@ export class DashboardComponent {
 				break;
 			case MenuItem.REMOVE:
 				this.tableData[this.selectedTab].splice(this.selectedRowID[this.selectedTab], 1);
+				console.log(this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]].ID);
+				this.dashboard.deleteTableData(this.selectedTab, (this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]].ID).toString());
 				this.selectedRowID[this.selectedTab] = null;
 				this.refreshTableData();
 				break;
@@ -106,6 +108,8 @@ export class DashboardComponent {
 				this.dashboard.insertIntoTable(this.selectedTab, tableData);
 			} else if(row != null) {
 				this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]] = row;
+				let tableData = JSON.stringify(row);
+				this.dashboard.updateTable(this.selectedTab, tableData);
 			}
 			this.refreshTableData();
 		});

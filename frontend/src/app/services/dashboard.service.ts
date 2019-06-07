@@ -25,4 +25,10 @@ export class DashboardService {
 	insertIntoTable(table: string, row: string){
 		return this.httpClient.get('/table/insert',  new HttpHeaders({'table': table, 'row': row}));
 	}
+	updateTable(table: string, row: string){
+		return this.httpClient.get('/table/update',  new HttpHeaders({'table': table, 'row': row }));
+	}
+	deleteTableData(table: string, row: string){
+		return this.httpClient.get('/table/delete',  new HttpHeaders({'table': table, 'row': row }));
+	}
 }

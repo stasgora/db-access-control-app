@@ -14,6 +14,13 @@ const INSERT_FISH_QUERY = 'INSERT INTO Fish(Species, Name, Size, Color, Tank_ID)
 const INSERT_AQUARIUM_QUERY = 'INSERT INTO Aquarium(Size, Volume, Material, Assignee_ID) VALUES (?, ?, ?, ?)';
 const INSERT_WORKER_QUERY = 'INSERT INTO Workers(Name, Surename, Age, Salary) VALUES (?, ?, ?, ?)';
 
+const UPDATE_FISH_QUERY = 'UPDATE Fish SET Species=?, Name=?, Size=?, Color=?, Tank_ID=?';
+const UPDATE_AQUARIUM_QUERY = 'UPDATE Aquarium SET Size=?, Volume=?, Material=?, Assignee_ID=?';
+const UPDATE_WORKERS_QUERY = 'UPDATE Workers SET Name=?, Surename=?, Age=?, Salary=?';
+const WHERE_ID_CLAUSE_QUERY = ' WHERE ID LIKE ?';
+
+const DELETE_FROM_QUERY = 'DELETE FROM ';
+
 const NEW_USER_PERMISSION_QUERY = 'Perm(User, Permission) VALUES (?, \'Rwud\')'; // rwud - Read/Write/Update/Delete, caps - can
 const SELECT_TABLE_QUERY = 'SELECT * FROM';
 
@@ -39,6 +46,18 @@ module.exports = {
 		else {
 			return (await executeQuery(INSERT_WORKER_QUERY, [values.Name, valuse.Surename, parseInt(values.Age,10), parseInt(values.Salary,10)]));
 		}
+	},
+	async updateTableData(table, data){
+		let values = JSON.parse(data);
+		console.log(table, values);
+		if(table === 'Fish')return (await executeQuery(UPDATE_FISH_QUERY + WHERE_ID_CLAUSE_QUERY, [values.Species, values.Name, values.Size, values.Color, parseInt(values.Tank_ID,10), values.ID]));
+		else if(table === 'Aquarium')return (await executeQuery(UPDATE_AQUARIUM_QUERY + WHERE_ID_CLAUSE_QUERY, [values.Size, parseInt(values.Volume, 10), values.Material, parseInt(values.Assignee_ID, 10), values.ID]));
+		else {
+			return (await executeQuery(UPDATE_WORKERS_QUERY + WHERE_ID_CLAUSE_QUERY, [values.Name, valuse.Surename, parseInt(values.Age,10), parseInt(values.Salary,10), values.ID]));
+		}
+	},
+	async deleteTableData(table, data){
+		return (await executeQuery(DELETE_FROM_QUERY + table + WHERE_ID_CLAUSE_QUERY, [parseInt(data,10)]));
 	},
 	createUser(user, hash) {
 		return executeQuery(CREATE_USER_QUERY, [user, hash]);

@@ -43,6 +43,24 @@ router.get('/table/insert', async (req, res, next) => {
 	}
 });
 
+router.get('/table/update', async (req, res, next) => {
+	try {
+		await dbService.updateTableData(req.get('table'), req.get('row'));
+		res.status(200).send(getSuccessResponse("updated data"));
+	} catch (err) {
+		next(err);
+	}
+});
+
+router.get('/table/delete', async (req, res, next) => {
+	try{
+		await dbService.deleteTableData(req.get('table'), req.get('row'));
+		res.status(200).send(getSuccessResponse("deleted data"));
+	}catch(err){
+		next(err);
+	}
+});
+
 router.get('/users/get', async (req, res, next) => {
 	try {
 		res.status(200).send(await dbService.getAllUsers());
