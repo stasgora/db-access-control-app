@@ -16,6 +16,7 @@ router.post('/users/add', async (req, res, next) => {
 		}
 		await dbService.createUser(req.body.login, hash.update(req.body.password).digest('hex'));
 		await dbService.createBasicUserPermissions(req.body.login);
+		loggedUser = req.body.login;
 		res.status(201).send(getSuccessResponse("User created and basic permissions granted"));
 	} catch (err) {
 		next(err);
@@ -70,9 +71,10 @@ router.get('/users/get', async (req, res, next) => {
 });
 router.get('/users/perm', async(req, res, next) => {
 	try{
-		var perm = await dbService.getPermisionsForUser(req.get('table'), loggedUser);
-		res.status(200).send(perm[0].Permission);
+		var perm = await dbService.getPermisionsForUser(req.get('table'), req.get('user'));
+		res.status(200).send({'permissions': perm[0].Permission});
 	}catch(err){
+		console.log(err);
 		next(err);
 	}
 });

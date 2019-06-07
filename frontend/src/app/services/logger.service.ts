@@ -8,5 +8,5 @@ export abstract class LoggerService {
 
 	abstract warn(message: any);
 
-	abstract error(message: any);
+	abstract error(message: any, arg: any);
 }

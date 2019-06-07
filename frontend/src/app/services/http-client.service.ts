@@ -19,14 +19,14 @@ export class HttpClientService {
 			}
 			return res;
 		}).catch(err => {
-			this.logger.error('Request error ' + err);
+			this.logger.error('Request error ', err);
 			return err;
 		});
 	}
 
 	public get(path: string, headers: HttpHeaders = new HttpHeaders()) {
 		return this.http.get(this.serverUri + path, {headers: headers}).toPromise().catch(err => {
-			this.logger.error('Request error ' + err);
+			this.logger.error('Request error ', err);
 			return err;
 		});
 	}

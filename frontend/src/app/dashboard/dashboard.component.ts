@@ -41,8 +41,8 @@ export class DashboardComponent {
 		}*/
 
 		this.tabs.forEach(tab =>{
-			this.dashboard.getUserPermission(tab).then( resp => {
-				var perms = resp.error.text; // in error field because of passing just string
+			this.dashboard.getUserPermission(tab, this.getLoggedUser()).then( resp => {
+				var perms = resp.permissions;
 				if(perms.toString().includes("r")){
 					var index = this.tabs.indexOf(tab);
 					if(index !== -1)this.tabs.splice(index, 1);
@@ -62,6 +62,10 @@ export class DashboardComponent {
 		});
 
 		this.checkMenuItemsForTable();
+	}
+
+	getLoggedUser(): string {
+		return localStorage.getItem('user')
 	}
 
 	rowSelected(event: any, row: any) {
@@ -93,9 +97,7 @@ export class DashboardComponent {
 					users = users.map(user => user.login);
 					let index = users.indexOf(localStorage.getItem("user"));
 					if (index !== -1) users.splice(index, 1);
-					this.dialog.open(UserListDialogComponent, { data: users}).afterClosed().subscribe(user => {
-						console.log(user);
-					});
+					this.displayUserDialog(item, users);
 				});
 				break;
 		}
@@ -116,6 +118,12 @@ export class DashboardComponent {
 		});
 	}
 
+	displayUserDialog(item: MenuItem, users: [string]) {
+		this.dialog.open(UserListDialogComponent, { data: {type: item, users: users} }).afterClosed().subscribe(val => {
+
+		});
+	}
+
 	checkMenuItemsForTable(){
 		this.menuItems = [
 			{icon: 'add_circle', type: MenuItem.ADD},
@@ -124,8 +132,8 @@ export class DashboardComponent {
 			{icon: 'https', type: MenuItem.PERMISSIONS},
 			{icon: 'forward', type: MenuItem.OWNERSHIP},
 		];
-		this.dashboard.getUserPermission(this.selectedTab).then( resp => {
-			var perms = resp.error.text; // in error field because of passing just string
+		this.dashboard.getUserPermission(this.selectedTab, this.getLoggedUser()).then( resp => {
+			var perms = resp.permissions;
 			this.menuItems.forEach( item=> {
 				if (item.type === MenuItem.ADD) {
 					if (perms.toString().includes("w")) {

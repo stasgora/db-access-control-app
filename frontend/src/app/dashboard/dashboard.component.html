@@ -28,7 +28,7 @@
 							</ng-container>
 							<mat-header-row *matHeaderRowDef="columns[tab]"></mat-header-row>
 							<mat-row *matRowDef="let row; columns: columns[tab];" (click)="rowSelected($event, row)"
-									 [ngClass]="{'highlight': tableData[this.selectedTab][selectedRowID[tab]] == row}"></mat-row>
+									 [ngClass]="{'highlight': selectedRowID[tab] != null && tableData[this.selectedTab][selectedRowID[tab]] == row}"></mat-row>
 						</mat-table>
 					</div>
 				</mat-tab>

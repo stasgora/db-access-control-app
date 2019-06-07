@@ -18,8 +18,8 @@ export class DashboardService {
 		return this.httpClient.get('/table/get', new HttpHeaders({'table': table}));
 	}
 
-	getUserPermission(table: string){
-		return this.httpClient.get('/users/perm',  new HttpHeaders({'table': table}));
+	getUserPermission(table: string, user: string){
+		return this.httpClient.get('/users/perm',  new HttpHeaders({'table': table, 'user': user}));
 	}
 
 	insertIntoTable(table: string, row: string){

@@ -14,9 +14,9 @@ export class ConsoleLoggerService extends LoggerService {
 		}
 	}
 
-	error(message: any) {
+	error(message: any, arg = null) {
 		if (this.debugMode) {
-			return console.error(message);
+			return console.error(message, arg);
 		}
 	}
 
