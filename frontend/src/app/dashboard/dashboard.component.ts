@@ -1,10 +1,12 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { Router } from "@angular/router";
 import { FormControl } from "@angular/forms";
-import { MatDialog, MatTabChangeEvent, MatTableDataSource } from "@angular/material";
+import { MatDialog, MatSidenav, MatTabChangeEvent, MatTabGroup, MatTableDataSource } from "@angular/material";
 import { TableRowDialogComponent } from "../dialogs/table-row-dialog/table-row-dialog.component";
 import { DashboardService } from "../services/dashboard.service";
-import { UserDialogType, UserListDialogComponent } from "../dialogs/user-list-dialog/user-list-dialog.component";
+import { UserListDialogComponent } from "../dialogs/user-list-dialog/user-list-dialog.component";
+import { MenuItem } from "../menu-item";
+import { StringUtils } from "../string-utils";
 
 @Component({
 	selector: 'app-dashboard',
@@ -15,13 +17,15 @@ export class DashboardComponent {
 	mode = new FormControl('side');
 	autoRedirect: boolean = false;
 
+	StringUtils = StringUtils;
 	MenuItem = MenuItem;
 	menuItems = [
 		{icon: 'add_circle', type: MenuItem.ADD},
 		{icon: 'edit', type: MenuItem.EDIT},
 		{icon: 'remove_circle', type: MenuItem.REMOVE},
-		{icon: 'https', type: MenuItem.PERMISSIONS},
-		{icon: 'forward', type: MenuItem.OWNERSHIP},
+		{icon: 'https', type: MenuItem.GRANT_PERMISSIONS},
+		{icon: 'fast_forward', type: MenuItem.TRANSFER_OWNERSHIP},
+		{icon: 'forward', type: MenuItem.TRANSFER_PERMISSIONS},
 	];
 	tabs = ['Aquarium', 'Fish', 'Workers'];
 	selectedTab = this.tabs[0];
@@ -29,6 +33,8 @@ export class DashboardComponent {
 	tableData = {};
 	columns = {};
 	selectedRowID = {};
+	@ViewChild('tabGroup') tabGroup: MatTabGroup;
+	@ViewChild('drawer') drawer: MatSidenav;
 
 	constructor(private router: Router, private dashboard: DashboardService, public dialog: MatDialog, private changeDetectorRefs: ChangeDetectorRef) {
 		/*let navRoute = this.router.getCurrentNavigation();
@@ -81,7 +87,7 @@ export class DashboardComponent {
 			case MenuItem.EDIT:
 				this.displayTableRowDialog(item, this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]]);
 				break;
-			case MenuItem.PERMISSIONS:
+			case MenuItem.GRANT_PERMISSIONS:
 				this.displayUserDialog(item);
 				break;
 			case MenuItem.REMOVE:
@@ -91,7 +97,10 @@ export class DashboardComponent {
 				this.selectedRowID[this.selectedTab] = null;
 				this.refreshTableData();
 				break;
-			case MenuItem.OWNERSHIP:
+			case MenuItem.TRANSFER_OWNERSHIP:
+				this.displayUserDialog(item);
+				break;
+			case MenuItem.TRANSFER_PERMISSIONS:
 				this.displayUserDialog(item);
 				break;
 		}
@@ -117,11 +126,13 @@ export class DashboardComponent {
 			users = users.map(user => user.login);
 			let index = users.indexOf(localStorage.getItem("user"));
 			if (index !== -1) users.splice(index, 1);
-
-			let type: UserDialogType = item == MenuItem.OWNERSHIP ? UserDialogType.CHOOSE : UserDialogType.PERMISSIONS;
-			this.dialog.open(UserListDialogComponent, { data: {type: type, users: users} }).afterClosed().subscribe(val => {
+			let data =  {type: item, users: users};
+			if(item === MenuItem.TRANSFER_PERMISSIONS) {
+				data['tables'] = this.tabs;
+			}
+			this.dialog.open(UserListDialogComponent, { data: data }).afterClosed().subscribe(val => {
 				console.log(val);
-				if(item == MenuItem.PERMISSIONS){
+				if(item == MenuItem.GRANT_PERMISSIONS){
 					this.dashboard.grantUserPermission(this.selectedTab, JSON.stringify(val));
 				}
 			});
@@ -129,13 +140,6 @@ export class DashboardComponent {
 	}
 
 	checkMenuItemsForTable(){
-		this.menuItems = [
-			{icon: 'add_circle', type: MenuItem.ADD},
-			{icon: 'edit', type: MenuItem.EDIT},
-			{icon: 'remove_circle', type: MenuItem.REMOVE},
-			{icon: 'https', type: MenuItem.PERMISSIONS},
-			{icon: 'forward', type: MenuItem.OWNERSHIP},
-		];
 		this.dashboard.getUserPermission(this.selectedTab, this.getLoggedUser()).then( resp => {
 			var perms = resp.permissions;
 			this.menuItems.forEach( item=> {
@@ -166,13 +170,13 @@ export class DashboardComponent {
 		this.dashboard.getTableOwner(this.selectedTab).then( resp => {
 			if(this.getLoggedUser() !== resp[0].Owner){
 				this.menuItems.forEach( item=> {
-					if (item.type === MenuItem.PERMISSIONS) {
+					if (item.type === MenuItem.GRANT_PERMISSIONS) {
 						let index = this.menuItems.indexOf(item);
 						if (index !== -1) this.menuItems.splice(index, 1);
 					}
 				});
 				this.menuItems.forEach( item=> {
-					if (item.type === MenuItem.OWNERSHIP) {
+					if (item.type === MenuItem.TRANSFER_OWNERSHIP) {
 						let index = this.menuItems.indexOf(item);
 						if (index !== -1) this.menuItems.splice(index, 1);
 					}
@@ -187,17 +191,15 @@ export class DashboardComponent {
 		);
 	}
 
-	formatMenuEntryText(item: MenuItem): string {
-		let name = MenuItem[item].toLowerCase();
-		return name.charAt(0).toUpperCase() + name.slice(1);
-	}
-
 	tabChanged(event: MatTabChangeEvent) {
 		this.selectedTab = this.tabs[event.index];
 		this.checkMenuItemsForTable();
 	}
-}
 
-export enum MenuItem {
-	ADD, EDIT, REMOVE, PERMISSIONS, OWNERSHIP
+	toggleSidebar() {
+		this.drawer.toggle();
+		setTimeout(() => {
+			this.tabGroup.realignInkBar();
+		}, 300);
+	}
 }

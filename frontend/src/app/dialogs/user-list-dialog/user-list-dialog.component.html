@@ -1,16 +1,16 @@
 <div>
 	<mat-form-field>
-		<mat-label>{{permissionsWindow ? 'Grant permissions to': 'Transfer Ownership to'}}</mat-label>
+		<mat-label>{{StringUtils.formatMenuEntryText(dialogType) + ' to'}}</mat-label>
 		<mat-select [(ngModel)]="selectedUser">
 			<mat-option *ngFor="let user of users" value="{{user}}">
 				{{user}}
 			</mat-option>
 		</mat-select>
 	</mat-form-field>
-	<div *ngIf="permissionsWindow">
-		<mat-slide-toggle color="primary" labelPosition="before" *ngFor="let item of permissionItems" [(ngModel)]="item.granted">
+	<div *ngIf="dialogType != MenuItem.TRANSFER_OWNERSHIP">
+		<mat-checkbox color="primary" *ngFor="let item of transferItems" [(ngModel)]="item.granted">
 			{{item.itemLabel}}
-		</mat-slide-toggle>
+		</mat-checkbox>
 	</div>
 	<div mat-dialog-actions align="end">
 		<button mat-button (click)="this.dialogRef.close()">Cancel</button>

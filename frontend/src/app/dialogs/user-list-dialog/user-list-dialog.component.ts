@@ -1,6 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
 import { TableRowDialogComponent } from "../table-row-dialog/table-row-dialog.component";
+import { MenuItem } from "../../menu-item";
+import { StringUtils } from "../../string-utils";
 
 @Component({
 	selector: 'app-user-list-dialog',
@@ -10,9 +12,12 @@ import { TableRowDialogComponent } from "../table-row-dialog/table-row-dialog.co
 export class UserListDialogComponent implements OnInit {
 	users: [{login: string}];
 	selectedUser: string;
-	permissionsWindow: boolean = false;
 
-	permissionItems: PermissionItem[] = [
+	dialogType: MenuItem;
+	StringUtils = StringUtils;
+	MenuItem = MenuItem;
+
+	transferItems: PermissionItem[] = [
 		new PermissionItem('R', 'Read'),
 		new PermissionItem('W', 'Write'),
 		new PermissionItem('U', 'Update'),
@@ -21,7 +26,10 @@ export class UserListDialogComponent implements OnInit {
 
 	constructor(@Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<TableRowDialogComponent>) {
 		this.users = data.users;
-		this.permissionsWindow = data.type == UserDialogType.PERMISSIONS;
+		this.dialogType = data.type;
+		if(this.dialogType === MenuItem.TRANSFER_PERMISSIONS) {
+			this.transferItems = data.tables.map(table => new PermissionItem(table, table));
+		}
 	}
 
 	closeDialog() {
@@ -29,8 +37,9 @@ export class UserListDialogComponent implements OnInit {
 			return;
 		}
 		let response = {'user': this.selectedUser};
-		if(this.permissionsWindow) {
-			this.permissionItems.forEach(item => response[item.itemCode] = item.granted);
+
+		if(this.dialogType != MenuItem.TRANSFER_OWNERSHIP) {
+			this.transferItems.forEach(item => response[item.itemCode] = item.granted);
 		}
 		this.dialogRef.close(response);
 	}
@@ -50,8 +59,4 @@ export class PermissionItem {
 		this.itemLabel = itemLabel;
 		this.granted = false;
 	}
-}
-
-export enum UserDialogType {
-	CHOOSE, PERMISSIONS
 }
