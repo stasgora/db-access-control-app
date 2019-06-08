@@ -1,12 +1,12 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
-import { Router } from "@angular/router";
-import { FormControl } from "@angular/forms";
-import { MatDialog, MatSidenav, MatTabChangeEvent, MatTabGroup, MatTableDataSource } from "@angular/material";
-import { TableRowDialogComponent } from "../dialogs/table-row-dialog/table-row-dialog.component";
-import { DashboardService } from "../services/dashboard.service";
-import { UserListDialogComponent } from "../dialogs/user-list-dialog/user-list-dialog.component";
-import { MenuItem } from "../menu-item";
-import { StringUtils } from "../string-utils";
+import {ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import {Router} from "@angular/router";
+import {FormControl} from "@angular/forms";
+import {MatDialog, MatSidenav, MatTabChangeEvent, MatTabGroup, MatTableDataSource} from "@angular/material";
+import {TableRowDialogComponent} from "../dialogs/table-row-dialog/table-row-dialog.component";
+import {DashboardService} from "../services/dashboard.service";
+import {UserListDialogComponent} from "../dialogs/user-list-dialog/user-list-dialog.component";
+import {MenuItem} from "../menu-item";
+import {StringUtils} from "../string-utils";
 
 @Component({
 	selector: 'app-dashboard',
@@ -28,6 +28,7 @@ export class DashboardComponent {
 		{icon: 'forward', type: MenuItem.TRANSFER_PERMISSIONS},
 	];
 	tabs = ['Aquarium', 'Fish', 'Workers'];
+	ADMIN_NAME = "admin@admin.com";
 	selectedTab = this.tabs[0];
 	tableDataPromise = {};
 	tableData = {};
@@ -50,6 +51,9 @@ export class DashboardComponent {
 				if(perms.toString().includes("r")){
 					var index = this.tabs.indexOf(tab);
 					if(index !== -1)this.tabs.splice(index, 1);
+				}
+				if(perms.toString().includes("R")){
+					this.selectedTab = tab;
 				}
 			});
 		});
@@ -131,17 +135,61 @@ export class DashboardComponent {
 				data['tables'] = this.tabs;
 			}
 			this.dialog.open(UserListDialogComponent, { data: data }).afterClosed().subscribe(val => {
-				console.log(val);
-				if(item == MenuItem.GRANT_PERMISSIONS){
-					this.dashboard.grantUserPermission(this.selectedTab, JSON.stringify(val));
+				if(val !== undefined) {
+					if (item == MenuItem.GRANT_PERMISSIONS) {
+						this.dashboard.grantUserPermission(this.selectedTab, JSON.stringify(val));
+					} else if (item == MenuItem.TRANSFER_OWNERSHIP) {
+						this.dashboard.transferOwnership(this.selectedTab, JSON.stringify(val));
+						this.dashboard.grantFullPermissions(this.selectedTab, JSON.stringify(val));
+					}else if(item == MenuItem.TRANSFER_PERMISSIONS) {
+						// If table owner is transfering permissions, then also transfers his ownership
+						let transferTables = [val.Aquarium, val.Fish, val.Workers];
+						let counter = 0;
+						transferTables.forEach( tab => {
+							this.dashboard.getTableOwner(this.tabs[counter]).then(resp => {
+								if (this.getLoggedUser() === resp[0].Owner) {
+									if(tab === true) {
+										this.dashboard.transferOwnership(this.selectedTab, JSON.stringify(val));
+										this.dashboard.grantFullPermissions(this.selectedTab, JSON.stringify(val));
+									}else{
+										console.log("Transfering to ADMIN");
+										this.dashboard.transferOwnership(this.selectedTab, "{ \"user\": \""+ this.ADMIN_NAME +"\"}");
+									}
+								}
+							});
+							counter += 1;
+						});
+						// Permission transfer following ownership transfer
+						counter = 0;
+						transferTables.forEach( tab => {
+							if(tab === true) {
+								this.dashboard.transferPermissions(this.tabs[counter], JSON.stringify(val), this.getLoggedUser());
+							}
+							counter += 1;
+						});
+						// After transfering permissions user loses all permissions
+						this.dashboard.revokeAllPermissions(this.getLoggedUser());
+					}
+					this.checkMenuItemsForTable();
 				}
 			});
 		});
 	}
 
 	checkMenuItemsForTable(){
+		this.menuItems = [
+			{icon: 'add_circle', type: MenuItem.ADD},
+			{icon: 'edit', type: MenuItem.EDIT},
+			{icon: 'remove_circle', type: MenuItem.REMOVE},
+			{icon: 'https', type: MenuItem.GRANT_PERMISSIONS},
+			{icon: 'fast_forward', type: MenuItem.TRANSFER_OWNERSHIP},
+			{icon: 'forward', type: MenuItem.TRANSFER_PERMISSIONS},
+		];
 		this.dashboard.getUserPermission(this.selectedTab, this.getLoggedUser()).then( resp => {
 			var perms = resp.permissions;
+			console.log(perms);
+			console.log(this.selectedTab);
+			console.log(this.getLoggedUser());
 			this.menuItems.forEach( item=> {
 				if (item.type === MenuItem.ADD) {
 					if (perms.toString().includes("w")) {
@@ -168,6 +216,8 @@ export class DashboardComponent {
 			});
 		});
 		this.dashboard.getTableOwner(this.selectedTab).then( resp => {
+			console.log(this.getLoggedUser());
+			console.log(resp[0].Owner);
 			if(this.getLoggedUser() !== resp[0].Owner){
 				this.menuItems.forEach( item=> {
 					if (item.type === MenuItem.GRANT_PERMISSIONS) {
@@ -192,6 +242,7 @@ export class DashboardComponent {
 	}
 
 	tabChanged(event: MatTabChangeEvent) {
+		console.log("test");
 		this.selectedTab = this.tabs[event.index];
 		this.checkMenuItemsForTable();
 	}

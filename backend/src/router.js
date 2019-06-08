@@ -71,6 +71,15 @@ router.get('/table/grant', async (req, res, next) => {
 	}
 });
 
+router.get('/table/grantFull', async (req, res, next) => {
+	try{
+		await dbService.grantFullPermissionsToUser(req.get('table'), req.get('user'));
+		res.status(200).send(getSuccessResponse("granted full permissions"));
+	}catch(err){
+		next(err);
+	}
+});
+
 router.get('/users/get', async (req, res, next) => {
 	try {
 		res.status(200).send(await dbService.getAllUsers());
@@ -88,10 +97,37 @@ router.get('/table/owner', async (req, res, next) => {
 	}
 });
 
+router.get('/table/transferOwnership', async (req, res, next) => {
+	try {
+		res.status(200).send(await dbService.transferTableOwnership(req.get('table'), req.get('user')));
+	} catch (err) {
+		next(err);
+	}
+});
+
+router.get('/table/transferPermissions', async (req, res, next) => {
+	try {
+		res.status(200).send(await dbService.transferTablePermissions(req.get('table'), req.get('user'), req.get('loggedUser')));
+	} catch (err) {
+		next(err);
+	}
+});
+
 router.get('/users/perm', async(req, res, next) => {
 	try{
 		var perm = await dbService.getPermisionsForUser(req.get('table'), req.get('user'));
+		console.log(req.get('table'), perm[0].User, perm[0].Permission);
 		res.status(200).send({'permissions': perm[0].Permission});
+	}catch(err){
+		next(err);
+	}
+});
+
+
+router.get('/users/revoke', async(req, res, next) => {
+	try{
+		await dbService.revokePermissionsForUser(req.get('user'));
+		res.status(200).send(" permissions revoked");
 	}catch(err){
 		next(err);
 	}

@@ -20,8 +20,10 @@ const UPDATE_WORKERS_QUERY = 'UPDATE Workers SET Name=?, Surename=?, Age=?, Sala
 const WHERE_ID_CLAUSE_QUERY = ' WHERE ID LIKE ?';
 
 const DELETE_FROM_QUERY = 'DELETE FROM ';
+const REVOKE_PERM_QUERY = 'Perm SET Permission=\"rwud\" WHERE user LIKE ?';
 
-const TABLE_OWNER_QUERY = 'SELECT Owner FROM TableOwners WHERE TableName LIKE ?';
+const TABLE_OWNER_QUERY = 'SELECT * FROM TableOwners WHERE TableName LIKE ?';
+const PERMISSION_FOR_USER_QUERY = 'Perm SET Permission=? WHERE user LIKE ?';
 
 const NEW_USER_PERMISSION_QUERY = 'Perm(User, Permission) VALUES (?, \'Rwud\')'; // rwud - Read/Write/Update/Delete, caps - can
 const SELECT_TABLE_QUERY = 'SELECT * FROM';
@@ -69,7 +71,27 @@ module.exports = {
 		perm += (values.W === true) ? 'W' : 'w';
 		perm += (values.U === true) ? 'U' : 'u';
 		perm += (values.D === true) ? 'D' : 'd';
-		return (await executeQuery("UPDATE " + table + "Perm SET Permission=? WHERE user LIKE ?", [perm, values.user]));
+		return (await executeQuery("UPDATE " + table + PERMISSION_FOR_USER_QUERY, [perm, values.user]));
+	},
+	async grantFullPermissionsToUser(table, user){
+		let perm = "RWUD";
+		return (await executeQuery("UPDATE " + table + PERMISSION_FOR_USER_QUERY, [perm, JSON.parse(user).user]));
+	},
+	async transferTableOwnership(table, user){
+		console.log(user);
+		let val = JSON.parse(user);
+		return (await executeQuery("UPDATE TableOwners SET Owner=? WHERE TableName LIKE ?", [val.user, table]));
+	},
+	async transferTablePermissions(table, user, loggedUser){
+		let val = JSON.parse(user);
+		return (await executeQuery("UPDATE " + table + "Perm SET Permission=(SELECT Permission FROM "+ table + "Perm WHERE user LIKE ?) WHERE user LIKE ?", [loggedUser, val.user]));
+	},
+	async revokePermissionsForUser(user){
+		let tabs = ['Aquarium', 'Fish', 'Workers'];
+		console.log("ok");
+		tabs.forEach( async tab=> {
+			await executeQuery("UPDATE "+tab+REVOKE_PERM_QUERY, [user]);
+		});
 	},
 	createUser(user, hash) {
 		return executeQuery(CREATE_USER_QUERY, [user, hash]);
@@ -84,7 +106,7 @@ module.exports = {
 		return (await executeQuery(USER_LOGIN_QUERY, [user, hash])).length === 1;
 	},
 	async getPermisionsForUser(table, user){
-		return executeQuery("SELECT Permission FROM "+ table + "Perm WHERE User LIKE" +"\""+user+"\"");
+		return executeQuery("SELECT * FROM "+ table + "Perm WHERE User LIKE" +"\""+user+"\"");
 	},
 	async getTableOwner(table){
 		return (await executeQuery(TABLE_OWNER_QUERY, [table]));

@@ -36,8 +36,22 @@ export class DashboardService {
 		return this.httpClient.get('/table/delete',  new HttpHeaders({'table': table, 'row': row }));
 	}
 
+	grantFullPermissions(table: string, user: string){
+		return this.httpClient.get('/table/grantFull', new HttpHeaders({'table': table, 'user': user}));
+	}
+
 	grantUserPermission(table: string, row: string){
 		return this.httpClient.get('/table/grant',  new HttpHeaders({'table': table, 'row': row }));
 	}
 
+	transferOwnership(table: string, user: string){
+		return this.httpClient.get('/table/transferOwnership',  new HttpHeaders({'table': table, 'user': user }));
+	}
+
+	transferPermissions(table: string, user: string, loggedUser: string){
+		return this.httpClient.get('/table/transferPermissions', new HttpHeaders({'table': table, 'user': user, 'loggedUser': loggedUser}));
+	}
+	revokeAllPermissions(user: string){
+		return this.httpClient.get('/users/revoke', new HttpHeaders({'user': user}));
+	}
 }
