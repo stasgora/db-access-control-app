@@ -156,6 +156,7 @@ export class DashboardComponent {
 					}else if(item == MenuItem.TRANSFER_PERMISSIONS) {
 						// If table owner is transfering permissions, then also transfers his ownership
 						console.log("PERMISSION TRANSFER START");
+						this.dashboard.revokeAllPermissions(val.user);
 						let transferTables = [val.Aquarium, val.Fish, val.Workers];
 						transferTables[0] = (transferTables[0] === true) ? "Aquarium" : "-";
 						transferTables[1] = (transferTables[1] === true) ? "Fish" : "-";
