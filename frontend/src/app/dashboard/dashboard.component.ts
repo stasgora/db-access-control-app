@@ -28,12 +28,14 @@ export class DashboardComponent {
 		{icon: 'forward', type: MenuItem.TRANSFER_PERMISSIONS},
 	];
 	tabs = ['Aquarium', 'Fish', 'Workers'];
+	mainTables = ['Aquarium', 'Fish', 'Workers'];
 	ADMIN_NAME = "admin@admin.com";
 	selectedTab = this.tabs[0];
 	tableDataPromise = {};
 	tableData = {};
 	columns = {};
 	selectedRowID = {};
+	counter = 0;
 	@ViewChild('tabGroup') tabGroup: MatTabGroup;
 	@ViewChild('drawer') drawer: MatSidenav;
 
@@ -44,32 +46,42 @@ export class DashboardComponent {
 			this.router.navigateByUrl('/login');
 			return
 		}*/
-
-		this.tabs.forEach(tab =>{
+		console.log("BEGIN DASHBOARD CONTRUCTOR");
+		let tmp = true;
+		this.tabs.forEach( tab =>{
 			this.dashboard.getUserPermission(tab, this.getLoggedUser()).then( resp => {
-				var perms = resp.permissions;
+				let perms = resp.permissions;
 				if(perms.toString().includes("r")){
-					var index = this.tabs.indexOf(tab);
+					let index = this.tabs.indexOf(tab);
 					if(index !== -1)this.tabs.splice(index, 1);
+					console.log("splice");
 				}
 				if(perms.toString().includes("R")){
-					this.selectedTab = tab;
+					if(tmp === true){
+						this.selectedTab = tab;
+						tmp = false;
+					}
 				}
 			});
 		});
 
 		this.tabs.forEach(tab => {
 			this.tableDataPromise[tab] = this.dashboard.getTableContent(tab).then(res => {
-				if(res.length > 0) {
-					this.columns[tab] = Object.keys(res[0]);
-					this.columns[tab].splice(0, 1);
+				if(res !== undefined) {
+					if (res.length > 0) {
+						this.columns[tab] = Object.keys(res[0]);
+						this.columns[tab].splice(0, 1);
+					}
+					this.tableData[tab] = res;
+					return new MatTableDataSource(res);
 				}
-				this.tableData[tab] = res;
-				return new MatTableDataSource(res);
 			});
 		});
 
-		this.checkMenuItemsForTable();
+		setTimeout( f => {
+			this.checkMenuItemsForTable();
+		}, 2000);
+		console.log("END DASHBOARD CONTRUCTOR");
 	}
 
 	getLoggedUser(): string {
@@ -143,30 +155,44 @@ export class DashboardComponent {
 						this.dashboard.grantFullPermissions(this.selectedTab, JSON.stringify(val));
 					}else if(item == MenuItem.TRANSFER_PERMISSIONS) {
 						// If table owner is transfering permissions, then also transfers his ownership
+						console.log("PERMISSION TRANSFER START");
 						let transferTables = [val.Aquarium, val.Fish, val.Workers];
-						let counter = 0;
+						transferTables[0] = (transferTables[0] === true) ? "Aquarium" : "-";
+						transferTables[1] = (transferTables[1] === true) ? "Fish" : "-";
+						transferTables[2] = (transferTables[2] === true) ? "Workers" : "-";
+						console.log(transferTables);
 						transferTables.forEach( tab => {
-							this.dashboard.getTableOwner(this.tabs[counter]).then(resp => {
-								if (this.getLoggedUser() === resp[0].Owner) {
-									if(tab === true) {
-										this.dashboard.transferOwnership(this.selectedTab, JSON.stringify(val));
-										this.dashboard.grantFullPermissions(this.selectedTab, JSON.stringify(val));
-									}else{
-										console.log("Transfering to ADMIN");
-										this.dashboard.transferOwnership(this.selectedTab, "{ \"user\": \""+ this.ADMIN_NAME +"\"}");
+							if(tab!== "-") {
+								console.log("NAZWA:", tab);
+								this.dashboard.getTableOwner(tab).then(resp => {
+									console.log(resp[0].Owner, resp[0].TableName);
+									if (this.getLoggedUser() === resp[0].Owner) {
+										console.log("User owns a table ", tab);
+										console.log(tab);
+										if (tab !== "-") {
+											console.log("Transfering this table to ", val.user);
+											this.dashboard.transferOwnership(tab, JSON.stringify(val));
+											console.log("Granting full permissions to ", val.user);
+											this.dashboard.grantFullPermissions(tab, JSON.stringify(val));
+										} else{
+											console.log("Transfering to ADMIN table",tab);
+											this.dashboard.transferOwnership(tab, "{ \"user\": \"" + this.ADMIN_NAME + "\"}");
+										}
 									}
-								}
-							});
-							counter += 1;
-						});
-						// Permission transfer following ownership transfer
-						counter = 0;
-						transferTables.forEach( tab => {
-							if(tab === true) {
-								this.dashboard.transferPermissions(this.tabs[counter], JSON.stringify(val), this.getLoggedUser());
+								});
 							}
-							counter += 1;
 						});
+						console.log("TRANSFERING PERMISSION OF NON-OWNER TABLES");
+						// Permission transfer following ownership transfer
+						this.counter = 0;
+						transferTables.forEach( tab => {
+							if(tab !== "-") {
+								console.log("Transfer of permission of table ", this.mainTables[this.counter]);
+								this.dashboard.transferPermissions(this.mainTables[this.counter], JSON.stringify(val), this.getLoggedUser());
+							}
+							this.counter += 1;
+						});
+						console.log("REVOKING PERMISSIONs");
 						// After transfering permissions user loses all permissions
 						this.dashboard.revokeAllPermissions(this.getLoggedUser());
 					}
@@ -177,6 +203,7 @@ export class DashboardComponent {
 	}
 
 	checkMenuItemsForTable(){
+		//console.log("checkMenuItemsForTable()");
 		this.menuItems = [
 			{icon: 'add_circle', type: MenuItem.ADD},
 			{icon: 'edit', type: MenuItem.EDIT},
@@ -186,10 +213,9 @@ export class DashboardComponent {
 			{icon: 'forward', type: MenuItem.TRANSFER_PERMISSIONS},
 		];
 		this.dashboard.getUserPermission(this.selectedTab, this.getLoggedUser()).then( resp => {
-			var perms = resp.permissions;
-			console.log(perms);
-			console.log(this.selectedTab);
-			console.log(this.getLoggedUser());
+			let perms = resp.permissions;
+			//console.log("Checking permissions for MENU ITEMS: ");
+			//console.log(perms, this.selectedTab, this.getLoggedUser());
 			this.menuItems.forEach( item=> {
 				if (item.type === MenuItem.ADD) {
 					if (perms.toString().includes("w")) {
@@ -216,8 +242,8 @@ export class DashboardComponent {
 			});
 		});
 		this.dashboard.getTableOwner(this.selectedTab).then( resp => {
-			console.log(this.getLoggedUser());
-			console.log(resp[0].Owner);
+			//console.log(this.getLoggedUser());
+			//console.log(resp[0].Owner);
 			if(this.getLoggedUser() !== resp[0].Owner){
 				this.menuItems.forEach( item=> {
 					if (item.type === MenuItem.GRANT_PERMISSIONS) {
@@ -242,7 +268,6 @@ export class DashboardComponent {
 	}
 
 	tabChanged(event: MatTabChangeEvent) {
-		console.log("test");
 		this.selectedTab = this.tabs[event.index];
 		this.checkMenuItemsForTable();
 	}
