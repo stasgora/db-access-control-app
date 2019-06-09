@@ -113,6 +113,14 @@ router.get('/table/transferPermissions', async (req, res, next) => {
 	}
 });
 
+router.get('/users/moveToAdmin', async (req, res, next) => {
+	try {
+		res.status(200).send(await dbService.moveOwnershipToAdmin(req.get('user')));
+	} catch (err) {
+		next(err);
+	}
+});
+
 router.get('/users/perm', async(req, res, next) => {
 	try{
 		var perm = await dbService.getPermisionsForUser(req.get('table'), req.get('user'));

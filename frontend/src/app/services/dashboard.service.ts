@@ -54,4 +54,7 @@ export class DashboardService {
 	revokeAllPermissions(user: string){
 		return this.httpClient.get('/users/revoke', new HttpHeaders({'user': user}));
 	}
+	moveOwnedToAdmin(user: string){
+		return this.httpClient.get('/users/moveToAdmin', new HttpHeaders({'user': user}));
+	}
 }

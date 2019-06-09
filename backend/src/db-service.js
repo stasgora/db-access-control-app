@@ -86,6 +86,9 @@ module.exports = {
 		let val = JSON.parse(user);
 		return (await executeQuery("UPDATE " + table + "Perm SET Permission=(SELECT Permission FROM "+ table + "Perm WHERE user LIKE ?) WHERE user LIKE ?", [loggedUser, val.user]));
 	},
+	async moveOwnershipToAdmin(user){
+		return (await executeQuery("UPDATE TableOwners SET Owner=\"admin@admin.com\" WHERE Owner LIKE ?", [user]));
+	},
 	async revokePermissionsForUser(user){
 		let tabs = ['Aquarium', 'Fish', 'Workers'];
 		console.log("ok");
