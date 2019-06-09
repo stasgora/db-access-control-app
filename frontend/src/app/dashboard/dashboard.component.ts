@@ -107,9 +107,8 @@ export class DashboardComponent {
 				this.displayUserDialog(item);
 				break;
 			case MenuItem.REMOVE:
+				this.dashboard.deleteTableData(this.selectedTab, "{ \"ID\":"+(this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]].ID)+" }");
 				this.tableData[this.selectedTab].splice(this.selectedRowID[this.selectedTab], 1);
-				console.log(this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]].ID);
-				this.dashboard.deleteTableData(this.selectedTab, (this.tableData[this.selectedTab][this.selectedRowID[this.selectedTab]].ID).toString());
 				this.selectedRowID[this.selectedTab] = null;
 				this.refreshTableData();
 				break;

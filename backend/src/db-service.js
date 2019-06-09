@@ -44,16 +44,15 @@ module.exports = {
 	},
 	async insertIntoTableData(table, data){
 		let values = JSON.parse(data);
-		console.log(values);
 		if(table === 'Fish')return (await executeQuery(INSERT_FISH_QUERY, [values.Species, values.Name, values.Size, values.Color, parseInt(values.Tank_ID,10)]));
 		else if(table === 'Aquarium')return (await executeQuery(INSERT_AQUARIUM_QUERY, [values.Size, parseInt(values.Volume, 10), values.Material, parseInt(values.Assignee_ID, 10)]));
 		else {
-			return (await executeQuery(INSERT_WORKER_QUERY, [values.Name, valuse.Surename, parseInt(values.Age,10), parseInt(values.Salary,10)]));
+			return (await executeQuery(INSERT_WORKER_QUERY, [values.Name, values.Surename, parseInt(values.Age,10), parseInt(values.Salary,10)]));
 		}
 	},
 	async updateTableData(table, data){
 		let values = JSON.parse(data);
-		console.log(table, values);
+		console.log(data);
 		if(table === 'Fish')return (await executeQuery(UPDATE_FISH_QUERY + WHERE_ID_CLAUSE_QUERY, [values.Species, values.Name, values.Size, values.Color, parseInt(values.Tank_ID,10), values.ID]));
 		else if(table === 'Aquarium')return (await executeQuery(UPDATE_AQUARIUM_QUERY + WHERE_ID_CLAUSE_QUERY, [values.Size, parseInt(values.Volume, 10), values.Material, parseInt(values.Assignee_ID, 10), values.ID]));
 		else {
@@ -61,10 +60,11 @@ module.exports = {
 		}
 	},
 	async deleteTableData(table, data){
-		return (await executeQuery(DELETE_FROM_QUERY + table + WHERE_ID_CLAUSE_QUERY, [parseInt(data,10)]));
+		console.log("DATA:",data);
+		let values = JSON.parse(data);
+		return (await executeQuery(DELETE_FROM_QUERY + table + WHERE_ID_CLAUSE_QUERY, [values.ID]));
 	},
 	async grantPermissionToUser(table, data){
-		console.log(data);
 		let values = JSON.parse(data);
 		let perm = "";
 		perm += (values.R === true) ? 'R' : 'r';
@@ -78,7 +78,6 @@ module.exports = {
 		return (await executeQuery("UPDATE " + table + PERMISSION_FOR_USER_QUERY, [perm, JSON.parse(user).user]));
 	},
 	async transferTableOwnership(table, user){
-		console.log(user);
 		let val = JSON.parse(user);
 		return (await executeQuery("UPDATE TableOwners SET Owner=? WHERE TableName LIKE ?", [val.user, table]));
 	},
@@ -91,7 +90,6 @@ module.exports = {
 	},
 	async revokePermissionsForUser(user){
 		let tabs = ['Aquarium', 'Fish', 'Workers'];
-		console.log("ok");
 		tabs.forEach( async tab=> {
 			await executeQuery("UPDATE "+tab+REVOKE_PERM_QUERY, [user]);
 		});
